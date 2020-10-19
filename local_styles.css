@@ -1,0 +1,20 @@
+/* D3 tooltip for map */
+div.tooltip { 
+    position: absolute;     
+    text-align: center;
+    color: white;     
+    width: 200px;          
+    height: 60px;         
+    padding: 2px;       
+    font: 12px sans-serif;
+    background-color: gray;
+    border: 2px;
+    border: solid;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+div.centered {
+  top: 50%;
+  left: 50%;
+}​
