@@ -1,10 +1,13 @@
 // $cloropleth = $('#cloropleth');
 // $cloropleth.text('Success');
+// define map size
+var height = 500, width = 800;
 
-var height = 500, width = 300;
+var projection = d3.geoAlbersUsa()
 
-// create a geo path - https://github.com/mbostock/d3/wiki/Geo-Paths
-var path = d3.geoPath();
+// create a geo path
+var path = d3.geoPath()
+            .projection(projection)
 
 // create an svg element
 var svg = d3.select("#choropleth")
@@ -30,6 +33,7 @@ d3.json("datasets/counties.geo.json", function(json) {
           .enter()
           .append("path")
           .attr("d", path)
+          .attr("fill", "blue")
           .style('stroke', 'black')
           .style('stroke-width', 1)
 });
