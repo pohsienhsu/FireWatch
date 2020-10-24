@@ -14,7 +14,7 @@ var colorScale = d3.scaleQuantile()
 // enter code to define tooltip
 var tooltip = d3.select('body').append("div")
   .attr("class", "tooltip")
-  .style("opacity", 0)
+  .style("opacity", 0);
 
 // enter code to define projection and path required for Choropleth
 var path = d3.geoPath();
@@ -27,7 +27,7 @@ var projection = d3.geoAlbersUsa()
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
-  d3.csv("datasets/ratings-by-country.csv", (data) => {
+  d3.csv("fires.csv", (data) => {
     return {
       avg_rating: parseFloat(data['Average Rating']),
       country: data['Country'],
