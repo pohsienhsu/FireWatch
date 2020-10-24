@@ -14,7 +14,7 @@ var colorScale = d3.scaleQuantile()
 // enter code to define tooltip
 var tooltip = d3.select('body').append("div")
   .attr("class", "tooltip")
-  .style("opacity", 0)
+  .style("opacity", 0);
 
 // enter code to define projection and path required for Choropleth
 var path = d3.geoPath();
