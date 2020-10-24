@@ -27,7 +27,7 @@ var projection = d3.geoAlbersUsa()
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
-  d3.csv("datasets/ratings-by-country.csv", (data) => {
+  d3.csv("fires.csv", (data) => {
     return {
       avg_rating: parseFloat(data['Average Rating']),
       country: data['Country'],
