@@ -23,56 +23,69 @@ var projection = d3.geoAlbersUsa()
   //  .center([0,20])
   .translate([width / 2, height / 2]);
 
+const formatDate = d3.timeFormat("%Y");
+// const parseYear = d3.timeParse("%Y");
+const parseDate = d3.timeParse("%Y-%m-%d");
+const parseYear = d3.timeParse("%Y");
+
 // define any other global variables 
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
-  d3.csv("fires.csv", (data) => {
+  d3.json("datasets/counties.geo.json"),
+  d3.csv("datasets/fire_perDate.csv", (data) => {
     return {
-      avg_rating: parseFloat(data['Average Rating']),
-      country: data['Country'],
-      game: data['Game'],
-      num_users: parseInt(data['Number of Users']),
+      fire_code: data['FIRE_CODE'],
+      fire_name: data['FIRE_NAME'],
+      fire_year: formatDate(parseDate(data["DISCOVERY_Date"])),
+      discovery_date: parseDate(data['DISCOVERY_Date']),
+      continue_date: parseDate(data['CONT_Date']),
+      owner_code: parseInt(data["OWNER_CODE"]),
+      owner_descr: data["OWNER__DESCR"],
+      state: data["STATE"],
+      county: data["COUNTY_NAME"], 
     }
-  }),
-  d3.json("datasets/counties.geo.json")
+  })
 ]).then((values) => {
   // enter code to call ready() with required arguments
   ready(null, values[0], values[1], values[2]);
+  // ready(null, values[0], values[1])
 }
 );
 
 // this function should be called once the data from files have been read
-// world: topojson from world_countries.json
-// gameData: data from ratings-by-country.csv
-function ready(error, state, gameData, county) {
-  // enter code to extract all unique games from gameDatas
-  let games = [];
-  gameData.forEach((datum) => {
-    if (!games.includes(datum.game)) {
-      games.push(datum.game);
+// state: topojson from state.geo.json
+// county: topojson from counties.geo.json
+// fireData: data from fire_dates_fixed.csv
+function ready(error, state, county, fireData) {
+  // enter code to extract all unique games from fireDatas
+  let years = [];
+  fireData.forEach((datum) => {
+    // console.log(datum.fire_year);
+    if (!years.includes(datum.fire_year)) {
+      years.push(datum.fire_year);
     }
   })
-  games.sort();
+  years.sort();
 
-  // enter code to append the game options to the dropdown
+  // enter code to append the years to the dropdown
   d3.select("#dropdown")
     .selectAll('myOptions')
-    .data(games)
+    .data(years)
     .enter()
     .append('option')
     .text(function (d) { return d; })
     .attr("value", function (d) { return d; })
 
   // event listener for the dropdown. Update choropleth and legend when selection changes. Call createMapAndLegend() with required arguments.
-  d3.select("#dropdown").on("change", function (d) {
-    var selectedGame = d3.select(this).property("value")
-    console.log(state, gameData, selectedGame)
-    createMapAndLegend(state, county, gameData, selectedGame)
-  })
+  // d3.select("#dropdown").on("change", function (d) {
+  //   var selectedYear = d3.select(this).property("value")
+  //   console.log(state, fireData, selectedYear)
+  //   createMapAndLegend(state, county, fireData, selectedYear)
+  // })
 
   // create Choropleth with default option. Call createMapAndLegend() with required arguments. 
-  createMapAndLegend(state, county, gameData, games[0])
+  createMapAndLegend(state, county, fireData);
 }
 
 // helpers for tooltip
@@ -80,10 +93,10 @@ function showtooltip(d, properties_dict) {
   tooltip.transition()
     .duration(200)
     .style("opacity", .8);
-  tooltip.html("<b>Country</b>: " + d.properties.name + "<br />"
-    + "<b>Game</b>: " + d3.select('#dropdown').property("value") + "<br />"
-    + "<b>Avg Rating</b>: " + (d.properties.name in properties_dict ? properties_dict[d.properties.name].avg_rating : 0) + "<br />"
-    + "<b>Number of Users</b>: " + (d.properties.name in properties_dict ? properties_dict[d.properties.name].num_users : 0))
+  console.log(properties_dict["state"]);
+  console.log(properties_dict["county"]);
+  tooltip.html("<b>State</b>: " + properties_dict[d.properties.state] + "<br />"
+    + "<b>County</b>: " + properties_dict[d.properties.county] + "<br />")
     .style("left", (d3.event.pageX + 20) + "px")
     .style("top", (d3.event.pageY + 20) + "px");
 }
@@ -98,19 +111,35 @@ function hidetooltip(d) {
     .style("opacity", 0);
 }
 
-// this function should create a Choropleth and legend using the state and gameData arguments for a selectedGame
+// this function should create a Choropleth and legend using the state and fireData arguments for a selectedGame
 // also use this function to update Choropleth and legend when a different game is selected from the dropdown
-function createMapAndLegend(state, county, gameData, selectedGame) {
+function createMapAndLegend(state, county, fireData) {
+  // let states = []
+  // fireData.forEach((datum) => {
+  //   if(!states.includes(datum.state)) {
+  //     states.push(datum.state)
+  //   }
+  // })
+
+  // let counties = []
+  // fireData.forEach((datum) => {
+  //   if(!counties.includes(datum.county)) {
+  //     counties.push(datum.county)
+  //   }
+  // })
+
   // clear out everything currently in the svg
   svg.select('g').remove()
+
   // only consider data for selectedGame
-  let filteredGameData = gameData.filter((datum) => { return datum.game === selectedGame })
-  // mapping from each country to its properties
+  // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
+  // mapping from each county to its properties
   let properties_dict = {}
-  filteredGameData.forEach((datum) => {
-    properties_dict[datum.country] = datum
+  fireData.forEach((datum) => {
+    properties_dict["state"] = datum.state;
+    properties_dict["county"] = datum.state;
   })
-  colorScale.domain(d3.extent(filteredGameData, function (d) { return d.avg_rating; }))
+  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
 
   // add states
   svg.append("g")
@@ -120,20 +149,14 @@ function createMapAndLegend(state, county, gameData, selectedGame) {
     .append("path")
     .attr("d", d3.geoPath().projection(projection))
     .attr("id", function (d) {
-      return d.properties.name;
+      return d.properties.NAME10;
     })
-    // .attr("fill", function (d) {
-    //   if (d.properties.name in properties_dict) {
-    //     return colorScale(properties_dict[d.properties.name].avg_rating);
-    //   }
-    //   return 'gray';
-    // })
     .attr("fill", '#696969')
     .attr("stroke", "white")
     .attr("stroke-width", "2px")
-    .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
-    .on("mousemove", (d) => { movetooltip(d) })
-    .on("mouseleave", (d) => { hidetooltip(d) });
+    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
+    // .on("mousemove", (d) => { movetooltip(d) })
+    // .on("mouseleave", (d) => { hidetooltip(d) });
 
   // add counties
   svg.append("g")
@@ -145,23 +168,20 @@ function createMapAndLegend(state, county, gameData, selectedGame) {
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
     .attr("fill", "none")
-  // .attr("id", function (d) {
-  //   return d.properties.name;
-  // })
-  // .attr("fill", function (d) {
-  //   if (d.properties.name in properties_dict) {
-  //     return colorScale(properties_dict[d.properties.name].avg_rating);
-  //   }
-  //   return 'gray';
-  // })
+    .attr("id", function (d) {
+      return d.properties.NAME;
+    })
+    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
+    // .on("mousemove", (d) => { movetooltip(d) })
+    // .on("mouseleave", (d) => { hidetooltip(d) });
 
   // also add the legend
-  svg.append("g")
-    .attr("class", "legend")
-    .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
-  var legend = d3.legendColor()
-    .scale(colorScale)
-    .title("Legend")
-    .labelFormat(d3.format('.2f'));
-  d3.select(".legend").call(legend);
+  // svg.append("g")
+  //   .attr("class", "legend")
+  //   .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
+  // var legend = d3.legendColor()
+  //   .scale(colorScale)
+  //   .title("Legend")
+  //   .labelFormat(d3.format('.2f'));
+  // d3.select(".legend").call(legend);
 }
