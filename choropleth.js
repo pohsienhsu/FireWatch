@@ -28,28 +28,6 @@ const formatDate = d3.timeFormat("%Y");
 const parseDate = d3.timeParse("%Y-%m-%d");
 const parseYear = d3.timeParse("%Y");
 
-function next_year_await() {
-  var selectedYear = 1994
-  return d3.csv("datasets/daily_aqi_by_county_" +selectedYear+ "/daily_aqi_by_county_" +selectedYear + ".csv", (data) => {
-     return {
-       state_name: data["State Name"],
-       county_name: data["county Name"],
-       state_code: data["State Code"],
-       county_code: data["County Code"],
-       date: data["Date"],
-       aqi: data["AQI"],
-       cat: data["Category"],
-       def_param: data["Defining Parameter"],
-       def_site: data["Defining Site"],
-       site_reported: data["Number of Sites Reporting"]
-     }
-   })
-}
-
-async function next_year() {
-  return await next_year_await();
-}
-
 var states_json = [];
 var county_json = [];
 var fires_arr = [];
@@ -72,15 +50,13 @@ Promise.all([
       state: data["STATE"],
       county: data["COUNTY_NAME"],
     }
-  }),
-  d3.csv("datasets/daily_aqi_by_county_1992/daily_aqi_by_county_1992.csv")
+  })
 ]).then((values) => {
   // enter code to call ready() with required arguments
   states_json = values[0]
   county_json = values[1]
   fires_arr = values[2]
-  aqi_init_year_arr = values[3]
-  ready(null, values[0], values[1], values[2], values[3]);
+  ready(null, values[0], values[1], values[2]);
   // ready(null, values[0], values[1])
 }
 );
@@ -90,7 +66,7 @@ Promise.all([
 // county: topojson from counties.geo.json
 // fireData: data from fire_dates_fixed.csv
 var aqiData = [];
-function ready(error, state, county, fireData, aqiData) {
+function ready(error, state, county, fireData) {
   // enter code to extract all unique games from fireDatas
   let years = [];
   fireData.forEach((datum) => {
