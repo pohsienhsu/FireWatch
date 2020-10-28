@@ -9,7 +9,7 @@ var svg = d3.select("#choropleth").append("svg")
 
 // enter code to create color scale
 var colorScale = d3.scaleQuantile()
-  .range(d3.schemeBlues[4]);
+  .range(d3.schemeReds[4]);
 
 // enter code to define tooltip
 var tooltip = d3.select('body').append("div")
@@ -28,7 +28,34 @@ const formatDate = d3.timeFormat("%Y");
 const parseDate = d3.timeParse("%Y-%m-%d");
 const parseYear = d3.timeParse("%Y");
 
-// define any other global variables 
+function next_year_await() {
+  var selectedYear = 1994
+  return d3.csv("datasets/daily_aqi_by_county_" +selectedYear+ "/daily_aqi_by_county_" +selectedYear + ".csv", (data) => {
+     return {
+       state_name: data["State Name"],
+       county_name: data["county Name"],
+       state_code: data["State Code"],
+       county_code: data["County Code"],
+       date: data["Date"],
+       aqi: data["AQI"],
+       cat: data["Category"],
+       def_param: data["Defining Parameter"],
+       def_site: data["Defining Site"],
+       site_reported: data["Number of Sites Reporting"]
+     }
+   })
+}
+
+async function next_year() {
+  return await next_year_await();
+}
+
+var states_json = [];
+var county_json = [];
+var fires_arr = [];
+var aqi_init_year_arr = [];
+
+// define any other global variables
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
@@ -43,12 +70,17 @@ Promise.all([
       owner_code: parseInt(data["OWNER_CODE"]),
       owner_descr: data["OWNER__DESCR"],
       state: data["STATE"],
-      county: data["COUNTY_NAME"], 
+      county: data["COUNTY_NAME"],
     }
-  })
+  }),
+  d3.csv("datasets/daily_aqi_by_county_1992/daily_aqi_by_county_1992.csv")
 ]).then((values) => {
   // enter code to call ready() with required arguments
-  ready(null, values[0], values[1], values[2]);
+  states_json = values[0]
+  county_json = values[1]
+  fires_arr = values[2]
+  aqi_init_year_arr = values[3]
+  ready(null, values[0], values[1], values[2], values[3]);
   // ready(null, values[0], values[1])
 }
 );
@@ -57,7 +89,8 @@ Promise.all([
 // state: topojson from state.geo.json
 // county: topojson from counties.geo.json
 // fireData: data from fire_dates_fixed.csv
-function ready(error, state, county, fireData) {
+var aqiData = [];
+function ready(error, state, county, fireData, aqiData) {
   // enter code to extract all unique games from fireDatas
   let years = [];
   fireData.forEach((datum) => {
@@ -77,17 +110,31 @@ function ready(error, state, county, fireData) {
     .text(function (d) { return d; })
     .attr("value", function (d) { return d; })
 
+  // for default year
+  var selectedYear = years[0]
+  d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
+                 .then(function(data) {
+                   console.log(data)
+                   aqiData = data
+                   console.log(state, county, fireData, aqiData, selectedYear)
+                   // WARNING: Currently only for AQI data. Need to implement checkbox listener to see which data to present
+                   createMapAndLegend(state, county, fireData, aqiData, selectedYear)
+                 })
+
   // event listener for the dropdown. Update choropleth and legend when selection changes. Call createMapAndLegend() with required arguments.
-  // d3.select("#dropdown").on("change", function (d) {
-  //   var selectedYear = d3.select(this).property("value")
-  //   console.log(state, fireData, selectedYear)
-  //   createMapAndLegend(state, county, fireData, selectedYear)
-  // })
-
-  // create Choropleth with default option. Call createMapAndLegend() with required arguments. 
-  createMapAndLegend(state, county, fireData);
+  d3.select("#dropdown").on("change", function (d) {
+     // for year selected in dropdown by user
+     selectedYear = d3.select(this).property("value")
+     d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
+                    .then(function(data) {
+                      console.log(data)
+                      aqiData = data
+                      console.log(state, county, fireData, aqiData, selectedYear)
+                      // WARNING: Currently only for AQI data. Need to implement checkbox listener to see which data to present
+                      createMapAndLegend(state, county, fireData, aqiData, selectedYear)
+                    })
+  })
 }
-
 // helpers for tooltip
 function showtooltip(d, properties_dict) {
   tooltip.transition()
@@ -113,7 +160,7 @@ function hidetooltip(d) {
 
 // this function should create a Choropleth and legend using the state and fireData arguments for a selectedGame
 // also use this function to update Choropleth and legend when a different game is selected from the dropdown
-function createMapAndLegend(state, county, fireData) {
+function createMapAndLegend(state, county, fireData, aqiData, selectedYear) {
   // let states = []
   // fireData.forEach((datum) => {
   //   if(!states.includes(datum.state)) {
@@ -130,6 +177,11 @@ function createMapAndLegend(state, county, fireData) {
 
   // clear out everything currently in the svg
   svg.select('g').remove()
+
+  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum.Date).getFullYear() === parseInt(selectedYear) })
+  // NOTE: using filteredAqiData not aqiData here to get range by year.
+  // change this to aqiData, ... if you want to make one universal color domain
+  colorScale.domain(d3.extent(filteredAqiData, function (d) { return d.AQI; }))
 
   // only consider data for selectedGame
   // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
@@ -167,7 +219,20 @@ function createMapAndLegend(state, county, fireData) {
     .attr("d", d3.geoPath().projection(projection))
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
-    .attr("fill", "none")
+    .attr("fill", function(d) {
+       var state_code = d.properties.STATE
+       var county_code = d.properties.COUNTY
+       var county_name = d.properties.NAME
+
+       for (var i = 0; i < filteredAqiData.length; i++)
+       {
+         if (filteredAqiData[i]["county Name"] == county_name && filteredAqiData[i]["County Code"] == county_code && filteredAqiData[i]["State Code"] == state_code)
+         {
+           return colorScale(filteredAqiData[i]["AQI"])
+         }
+       }
+       return "grey";
+    })
     .attr("id", function (d) {
       return d.properties.NAME;
     })
