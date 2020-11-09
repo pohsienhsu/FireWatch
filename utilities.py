@@ -58,7 +58,7 @@ def compare_aqi_with_year(df, state=None, state_code=None, county=None, county_c
         return None, None
     
     year = aqi_df.iloc[0]['YEAR']
-    avg_year_aqi = get_aqi(df, year=year).AQI.mean()
+    avg_year_aqi = get_aqi(df, state=state, state_code=state_code, county=county, county_code=county_code, year=year).AQI.mean()
     avg_aqi = aqi_df.AQI.mean()
     return avg_aqi, avg_year_aqi
 
