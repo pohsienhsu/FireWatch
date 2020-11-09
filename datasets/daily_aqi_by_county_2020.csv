@@ -1,4 +1,4 @@
-"State Name","county Name","State Code","County Code","Date","AQI","Category","Defining Parameter","Defining Site","Number of Sites Reporting"
+"STATE_NAME","COUNTY_NAME","STATE_CODE","COUNTY_CODE","DATE","AQI","CATEGORY","DEFINING_PARAMETER","DEFINING_SITE","NUMBER_OF_SITES_REPORTING"
 "Alabama","Baldwin","01","003","2020-01-01",48,"Good","PM2.5","01-003-0010",1
 "Alabama","Baldwin","01","003","2020-01-04",13,"Good","PM2.5","01-003-0010",1
 "Alabama","Baldwin","01","003","2020-01-07",14,"Good","PM2.5","01-003-0010",1
