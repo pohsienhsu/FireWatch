@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import pandas as pd
 
 def load_data(fire_csv="datasets/fires.csv", aqi_csv="datasets/aqi.csv"):
     fires = pd.read_csv(fire_csv)
