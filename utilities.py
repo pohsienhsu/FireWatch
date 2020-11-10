@@ -89,8 +89,17 @@ def get_aqi_change(aqi, row, days):
     days_after = days[1]
     
     avg_aqi, avg_year_aqi = compare_aqi_with_year(aqi, state_code=state_code, county_code=county_code, date=date, days_before=days_before, days_after=days_after)
+    
     if avg_aqi is None or avg_year_aqi is None:
         return None
     
+    # Just return a value of 0 for counties that always have 0 as their AQI 
+    if avg_year_aqi is 0:
+        return 0
+    
     return (avg_aqi-avg_year_aqi)/avg_year_aqi
+
+def get_fires_in_range(fires, lower_bound, upper_bound):
+    fires = fires[(fires.FIRE_SIZE >= lower_bound) & (fires.FIRE_SIZE <= upper_bound) ]
+    return fires
     
