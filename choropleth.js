@@ -154,10 +154,10 @@ function createMapAndLegend(state, county, fireData, aqiData, selectedYear) {
   // clear out everything currently in the svg
   svg.select('g').remove()
 
-  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum.Date).getFullYear() === parseInt(selectedYear) })
+  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
   // NOTE: using filteredAqiData not aqiData here to get range by year.
   // change this to aqiData, ... if you want to make one universal color domain
-  colorScale.domain(d3.extent(filteredAqiData, function (d) { return d.AQI; }))
+  colorScale.domain(d3.extent(filteredAqiData, function (d) { return d["AQI"]; }))
 
   // only consider data for selectedGame
   // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
@@ -202,7 +202,7 @@ function createMapAndLegend(state, county, fireData, aqiData, selectedYear) {
 
        for (var i = 0; i < filteredAqiData.length; i++)
        {
-         if (filteredAqiData[i]["county Name"] == county_name && filteredAqiData[i]["County Code"] == county_code && filteredAqiData[i]["State Code"] == state_code)
+         if (filteredAqiData[i]["COUNTY_NAME"] == county_name && filteredAqiData[i]["COUNTY_CODE"] == county_code && filteredAqiData[i]["STATE_CODE"] == state_code)
          {
            return colorScale(filteredAqiData[i]["AQI"])
          }
