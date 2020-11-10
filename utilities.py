@@ -2,7 +2,9 @@
 import pandas as pd
 
 def load_data(fire_csv="datasets/fires.csv", aqi_csv="datasets/aqi.csv"):
-    fires = pd.read_csv(fire_csv)
+    # add dtype for FIRE_CODE to silence the warning
+    fires = pd.read_csv(fire_csv, dtype={"FIRE_CODE": str})
+    
     aqi = pd.read_csv(aqi_csv, dtype= \
             {"STATE_NAME": str, "COUNTY_NAME": str,"STATE_CODE": int,"COUNTY_CODE": int,"DATE": object, \
              "AQI": int,"CATEGORY": str,"DEFINING_PARAMETER": str, "DEFINING_SITE": str,"NUMBER_OF_SITES_REPORTING":int,
