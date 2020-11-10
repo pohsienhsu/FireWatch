@@ -2,7 +2,9 @@
 import pandas as pd
 
 def load_data(fire_csv="datasets/fires.csv", aqi_csv="datasets/aqi.csv"):
-    fires = pd.read_csv(fire_csv)
+    # add dtype for FIRE_CODE to silence the warning
+    fires = pd.read_csv(fire_csv, dtype={"FIRE_CODE": str})
+    
     aqi = pd.read_csv(aqi_csv, dtype= \
             {"STATE_NAME": str, "COUNTY_NAME": str,"STATE_CODE": int,"COUNTY_CODE": int,"DATE": object, \
              "AQI": int,"CATEGORY": str,"DEFINING_PARAMETER": str, "DEFINING_SITE": str,"NUMBER_OF_SITES_REPORTING":int,
@@ -89,8 +91,17 @@ def get_aqi_change(aqi, row, days):
     days_after = days[1]
     
     avg_aqi, avg_year_aqi = compare_aqi_with_year(aqi, state_code=state_code, county_code=county_code, date=date, days_before=days_before, days_after=days_after)
+    
     if avg_aqi is None or avg_year_aqi is None:
         return None
     
+    # Just return a value of 0 for counties that always have 0 as their AQI 
+    if avg_year_aqi is 0:
+        return 0
+    
     return (avg_aqi-avg_year_aqi)/avg_year_aqi
+
+def get_fires_in_range(fires, lower_bound, upper_bound):
+    fires = fires[(fires.FIRE_SIZE >= lower_bound) & (fires.FIRE_SIZE <= upper_bound) ]
+    return fires
     
