@@ -77,6 +77,8 @@ var aqiData = [];
 function ready(error, state, county, fireData) {
   // enter code to extract all unique games from fireDatas
   let years = [];
+
+  // really, the same for fires and aqi data
   fireData.forEach((datum) => {
     // console.log(datum.fire_year);
     if (!years.includes(datum.fire_year)) {
@@ -106,13 +108,6 @@ function ready(error, state, county, fireData) {
                    //console.log(data)
                    aqiData = data
                    console.log(state, county, fireData, aqiData, selectedYear)
-
-                   /*console.log("selectedYear")
-                   console.log(selectedYear)
-                   console.log("selectedMonth")
-                   console.log(selectedMonth)
-                   console.log("selectedDay")
-                   console.log(selectedDay) */
 
                    handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
                    // WARNING: Currently only for AQI data. Need to implement checkbox listener to see which data to present
@@ -163,9 +158,36 @@ function hidetooltip(d) {
     .style("opacity", 0);
 }
 
+function parseDays(filteredAqiData) {
+  d3.select("#dropdown_day").html("")
+
+  let filteredAqiDataByMonth = filteredAqiData.filter((datum) => { return parseInt(datum.fire_month) === parseInt(selectedMonth) })
+  let days = [];
+  filteredAqiDataByMonth.forEach((datum) => {
+    // console.log(datum.fire_days);
+    if (!days.includes(datum.fire_day)) {
+      days.push(datum.fire_day);
+    }
+  })
+  days.sort();
+  selectedDay = parseInt(days[0])
+
+  // enter code to append the months to the dropdown
+  d3.select("#dropdown_day")
+    .selectAll('myOptions')
+    .data(days)
+    .enter()
+    .append('option')
+    .text(function (d) { return d; })
+    .attr("value", function (d) { return d; })
+}
+
+
 function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
   let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
   let months = [];
+  d3.select("#dropdown_month").html("")
+  d3.select("#dropdown_day").html("")
 
   filteredAqiData.forEach((datum) => {
     //console.log(datum.fire_month);
@@ -189,28 +211,11 @@ function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
   d3.select("#dropdown_month").on("change", function (d) {
        // for year selected in dropdown by user
        selectedMonth = d3.select(this).property("value")
+       parseDays(filteredAqiData)
        createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
   })
 
-  let filteredAqiDataByMonth = filteredAqiData.filter((datum) => { return parseInt(datum.fire_month) === parseInt(selectedMonth) })
-  let days = [];
-  filteredAqiDataByMonth.forEach((datum) => {
-    // console.log(datum.fire_days);
-    if (!days.includes(datum.fire_day)) {
-      days.push(datum.fire_day);
-    }
-  })
-  days.sort();
-  selectedDay = parseInt(days[0])
-
-  // enter code to append the months to the dropdown
-  d3.select("#dropdown_day")
-    .selectAll('myOptions')
-    .data(days)
-    .enter()
-    .append('option')
-    .text(function (d) { return d; })
-    .attr("value", function (d) { return d; })
+  parseDays(filteredAqiData)
 
   d3.select("#dropdown_day").on("change", function (d) {
        // for year selected in dropdown by user
@@ -252,6 +257,7 @@ function createMapAndLegend(state, county, fireData, aqiData, selectedYear, sele
 
   // NOTE: using filteredAqiData not aqiData here to get range by year.
   // change this to aqiData, ... if you want to make one universal color domain
+  // i.e. within the yearly AQI range, how did this day do.
   colorScale.domain(d3.extent(filteredAqiData, function (d) { return d["AQI"]; }))
 
   // only consider data for selectedGame
@@ -317,13 +323,13 @@ function createMapAndLegend(state, county, fireData, aqiData, selectedYear, sele
     // .on("mousemove", (d) => { movetooltip(d) })
     // .on("mouseleave", (d) => { hidetooltip(d) });
 
-  // also add the legend
-  // svg.append("g")
-  //   .attr("class", "legend")
-  //   .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
-  // var legend = d3.legendColor()
-  //   .scale(colorScale)
-  //   .title("Legend")
-  //   .labelFormat(d3.format('.2f'));
-  // d3.select(".legend").call(legend);
+  //also add the legend
+  svg.append("g")
+     .attr("class", "legend")
+     .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
+  var legend = d3.legendColor()
+              .scale(colorScale)
+              .title("AQI Level Legend")
+              .labelFormat(d3.format('.2f'));
+  d3.select(".legend").call(legend);
 }
