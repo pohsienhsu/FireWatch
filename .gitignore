@@ -1,4 +1,5 @@
 .DS_Store
 .vscode/
 fires.csv
+aqi.csv
 .ipynb_checkpoints/
