@@ -31,7 +31,7 @@ var projection = d3.geoAlbersUsa()
   //  .center([0,20])
   .translate([width / 2, height / 2]);
 
-const formatDate = d3.timeFormat("%Y");
+const formatYear = d3.timeFormat("%Y");
 const formatMonth = d3.timeFormat("%m");
 const formatDay = d3.timeFormat("%d");
 
@@ -127,7 +127,7 @@ function ready(error, state, county, fireData) {
   d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
                  .then(function(data) {
                    data.forEach(function(d) {
-                     d["fire_year"]= formatDate(parseDate(d["DATE"]));
+                     d["fire_year"]= formatYear(parseDate(d["DATE"]));
                      d["fire_month"] = formatMonth(parseDate(d["DATE"]));
                      d["fire_day"] = formatDay(parseDate(d["DATE"]));
                    });
@@ -149,9 +149,9 @@ function ready(error, state, county, fireData) {
        d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
                     .then(function(data) {
                       data.forEach(function(d) {
-                        d["fire_year"]= formatDate(parseDate(d["DATE"]));
-                        d["fire_month"] = formatMonth(parseDate(d["DATE"]));
-                        d["fire_day"] = formatDay(parseDate(d["DATE"]));
+                        d["year"]= formatYear(parseDate(d["DATE"]));
+                        d["month"] = formatMonth(parseDate(d["DATE"]));
+                        d["day"] = formatDay(parseDate(d["DATE"]));
                       });
                       //console.log(data)
                       aqiData = data
@@ -293,7 +293,13 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     selecedtDay = 01
   }*/
 
-  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
+  console.log("Aqidata length: " + aqiData.length)
+  let filteredAqiData = aqiData.filter((datum) => {  
+                                                          return datum.fire_year == selectedYear  && 
+                                                          datum.fire_month == selectedMonth  &&
+                                                          datum.fire_day == selectedDay})
+
+  console.log("filtered Aqidata length: " + filteredAqiData.length)
 
   // this is for the year aqi avg reading
   // we are doing it by day now
@@ -318,6 +324,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
 
+/*
   // add states
   svg.append("g")
     .selectAll("path")
@@ -334,6 +341,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
     // .on("mousemove", (d) => { movetooltip(d) })
     // .on("mouseleave", (d) => { hidetooltip(d) });
+*/
 
   // add counties
   svg.append("g")
@@ -407,7 +415,9 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     selecedtDay = 01
   }*/
 
-  let filteredFireData = fireData.filter((datum) => { return parseInt(datum.fire_year) === parseInt(selectedYear) })
+  let filteredFireData = fireData.filter((datum) => { return datum.fire_year == selectedYear &&
+                                                             datum.fire_month == selectedMonth &&
+                                                             datum.fire_day == selectedDay })
 
   console.log("filteredFireData")
   console.log(filteredFireData)
@@ -434,6 +444,8 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
 
+
+/*
   // add states
   svg.append("g")
     .selectAll("path")
@@ -450,6 +462,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
     // .on("mousemove", (d) => { movetooltip(d) })
     // .on("mouseleave", (d) => { hidetooltip(d) });
+*/
 
   // add counties
   svg.append("g")
