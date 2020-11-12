@@ -149,9 +149,9 @@ function ready(error, state, county, fireData) {
        d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
                     .then(function(data) {
                       data.forEach(function(d) {
-                        d["year"]= formatYear(parseDate(d["DATE"]));
-                        d["month"] = formatMonth(parseDate(d["DATE"]));
-                        d["day"] = formatDay(parseDate(d["DATE"]));
+                        d["fire_year"]= formatYear(parseDate(d["DATE"]));
+                        d["fire_month"] = formatMonth(parseDate(d["DATE"]));
+                        d["fire_day"] = formatDay(parseDate(d["DATE"]));
                       });
                       //console.log(data)
                       aqiData = data
