@@ -53,9 +53,9 @@ Promise.all([
     return {
       fire_code: data['FIRE_CODE'],
       fire_name: data['FIRE_NAME'],
-      fire_year: data['FIRE_YEAR'],
-      fire_month: formatMonth(parseDate(data["DISCOVERY_DATE"])),
-      fire_day: formatDay(parseDate(data["DISCOVERY_DATE"])),
+      year: data['FIRE_YEAR'],
+      month: formatMonth(parseDate(data["DISCOVERY_DATE"])),
+      day: formatDay(parseDate(data["DISCOVERY_DATE"])),
       discovery_date: parseDate(data['DISCOVERY_DATE']),
       /*discovery_doy: parseDate(data['DISCOVERY_DOY']),
       discovery_time: parseDate(data['DISCOVERY_TIME']),*/
@@ -98,9 +98,9 @@ function ready(error, state, county, fireData) {
 
   // really, the same for fires and aqi data
   fireData.forEach((datum) => {
-    // console.log(datum.fire_year);
-    if (!years.includes(datum.fire_year)) {
-      years.push(datum.fire_year);
+    // console.log(datum.year);
+    if (!years.includes(datum.year)) {
+      years.push(datum.year);
     }
   })
   years.sort();
@@ -118,6 +118,7 @@ function ready(error, state, county, fireData) {
   d3.selectAll("input[name='map-type']").on("change", function() {
     radio_val = this.value
     button_pressed = 1
+    selectedYear = d3.select("#dropdown").property("value")
     handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
     createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
   })
@@ -127,9 +128,9 @@ function ready(error, state, county, fireData) {
   d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
                  .then(function(data) {
                    data.forEach(function(d) {
-                     d["fire_year"]= formatYear(parseDate(d["DATE"]));
-                     d["fire_month"] = formatMonth(parseDate(d["DATE"]));
-                     d["fire_day"] = formatDay(parseDate(d["DATE"]));
+                     d["year"]= formatYear(parseDate(d["DATE"]));
+                     d["month"] = formatMonth(parseDate(d["DATE"]));
+                     d["day"] = formatDay(parseDate(d["DATE"]));
                    });
                    //console.log(data)
                    //console.log(state, county, fireData, aqiData, selectedYear)
@@ -149,9 +150,9 @@ function ready(error, state, county, fireData) {
        d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
                     .then(function(data) {
                       data.forEach(function(d) {
-                        d["fire_year"]= formatYear(parseDate(d["DATE"]));
-                        d["fire_month"] = formatMonth(parseDate(d["DATE"]));
-                        d["fire_day"] = formatDay(parseDate(d["DATE"]));
+                        d["year"]= formatYear(parseDate(d["DATE"]));
+                        d["month"] = formatMonth(parseDate(d["DATE"]));
+                        d["day"] = formatDay(parseDate(d["DATE"]));
                       });
                       //console.log(data)
                       aqiData = data
@@ -195,12 +196,12 @@ function hidetooltip(d) {
 function parseDays(filteredData) {
   d3.select("#dropdown_day").html("")
 
-  let filteredDataByMonth = filteredData.filter((datum) => { return parseInt(datum.fire_month) === parseInt(selectedMonth) })
+  let filteredDataByMonth = filteredData.filter((datum) => { return parseInt(datum.month) === parseInt(selectedMonth) })
   let days = [];
   filteredDataByMonth.forEach((datum) => {
-    // console.log(datum.fire_days);
-    if (!days.includes(datum.fire_day)) {
-      days.push(datum.fire_day);
+    // console.log(datum.day);
+    if (!days.includes(datum.day)) {
+      days.push(datum.day);
     }
   })
   days.sort();
@@ -217,8 +218,8 @@ function parseDays(filteredData) {
 }
 
 function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
-  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
-  let filteredFireData = fireData.filter((datum) => { return datum.discovery_date.getFullYear() === parseInt(selectedYear) })
+  let filteredAqiData
+  let filteredFireData
   let months = [];
   d3.select("#dropdown_month").html("")
   d3.select("#dropdown_day").html("")
@@ -226,20 +227,22 @@ function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
   console.log("radio_val")
   console.log(radio_val)
  if (radio_val == "airQuality") {
+   filteredAqiData = aqiData.filter((datum) => { return datum.year == selectedYear })
    filteredAqiData.forEach((datum) => {
-     //console.log(datum.fire_month);
-     if (!months.includes(datum.fire_month)) {
-       months.push(datum.fire_month);
+     //console.log(datum.month);
+     if (!months.includes(datum.month)) {
+       months.push(datum.month);
      }
    })
    months.sort();
    selectedMonth = parseInt(months[0])
  }
- else {
+ else { 
+   filteredFireData = fireData.filter((datum) => { return datum.year == selectedYear })
    filteredFireData.forEach((datum) => {
-     //console.log(datum.fire_month);
-     if (!months.includes(datum.fire_month)) {
-       months.push(datum.fire_month);
+     //console.log(datum.month);
+     if (!months.includes(datum.month)) {
+       months.push(datum.month);
      }
    })
    months.sort();
@@ -293,13 +296,11 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     selecedtDay = 01
   }*/
 
-  console.log("Aqidata length: " + aqiData.length)
   let filteredAqiData = aqiData.filter((datum) => {  
-                                                          return datum.fire_year == selectedYear  && 
-                                                          datum.fire_month == selectedMonth  &&
-                                                          datum.fire_day == selectedDay})
+                                                          return datum.year == selectedYear  && 
+                                                          datum.month == selectedMonth  &&
+                                                          datum.day == selectedDay})
 
-  console.log("filtered Aqidata length: " + filteredAqiData.length)
 
   // this is for the year aqi avg reading
   // we are doing it by day now
@@ -322,7 +323,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     properties_dict["state"] = datum.state;
     properties_dict["county"] = datum.state;
   })
-  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
+  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
 /*
   // add states
@@ -361,9 +362,9 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
        {
          if (filteredAqiData[i]["COUNTY_NAME"] == county_name && filteredAqiData[i]["COUNTY_CODE"] == county_code && filteredAqiData[i]["STATE_CODE"] == state_code)
          {
-           var yr = parseInt(filteredAqiData[i].fire_year)
-           var m = parseInt(filteredAqiData[i].fire_month)
-           var d = parseInt(filteredAqiData[i].fire_day)
+           var yr = parseInt(filteredAqiData[i].year)
+           var m = parseInt(filteredAqiData[i].month)
+           var d = parseInt(filteredAqiData[i].day)
            if (yr == selectedYear && m == selectedMonth && d == selectedDay)
            {
              return colorScale(filteredAqiData[i]["AQI"])
@@ -415,12 +416,10 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     selecedtDay = 01
   }*/
 
-  let filteredFireData = fireData.filter((datum) => { return datum.fire_year == selectedYear &&
-                                                             datum.fire_month == selectedMonth &&
-                                                             datum.fire_day == selectedDay })
+  let filteredFireData = fireData.filter((datum) => { return datum.year == selectedYear &&
+                                                             datum.month == selectedMonth &&
+                                                             datum.day == selectedDay })
 
-  console.log("filteredFireData")
-  console.log(filteredFireData)
   // this is for the year aqi avg reading
   // we are doing it by day now
   /*var avgAqiPerYearData = d3.nest()
@@ -442,7 +441,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     properties_dict["state"] = datum.state;
     properties_dict["county"] = datum.state;
   })
-  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
+  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
 
 /*
@@ -482,9 +481,9 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
        {
          if (parseInt(filteredFireData[i].county_code) == county_code && parseInt(filteredFireData[i].state_code) == state_code)
          {
-           var yr = parseInt(filteredFireData[i].fire_year)
-           var m = parseInt(filteredFireData[i].fire_month)
-           var d = parseInt(filteredFireData[i].fire_day)
+           var yr = parseInt(filteredFireData[i].year)
+           var m = parseInt(filteredFireData[i].month)
+           var d = parseInt(filteredFireData[i].day)
            if (yr == selectedYear && m == selectedMonth && d == selectedDay)
            {
              return colorFireScale(filteredFireData[i].fire_size)
