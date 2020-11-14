@@ -1,11 +1,11 @@
 /* D3 tooltip for map */
-div.tooltip { 
-    position: absolute;     
+div.tooltip {
+    position: absolute;
     text-align: center;
-    color: white;     
-    width: 200px;          
-    height: 60px;         
-    padding: 2px;       
+    color: white;
+    width: 200px;
+    height: 80px;         
+    padding: 2px;
     font: 12px sans-serif;
     background-color: gray;
     border: 2px;
