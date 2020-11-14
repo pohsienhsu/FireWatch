@@ -407,17 +407,35 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   d3.select(".legend").call(legend);
 }
 
+function callback(datum) {
+  if (datum.year == selectedYear) {
+    if (datum.month < selectedMonth && datum.cont_month > selectedMonth)  {
+      return true;
+    }
+    if (datum.month == selectedMonth && datum.day <= selectedDay && datum.cont_month > selectedMonth) {
+      return true;
+    }
+    if (datum.month == selectedMonth && datum.day <= selectedDay && datum.cont_month == selectedMonth && (datum.cont_day >= selectedDay || datum.cont_day == "")) {
+      return true;
+    }
+    if (datum.cont_month == selectedMonth && (datum.cont_day >= selectedDay || datum.cont_day == "") && datum.month == selectedMonth) {
+      return true;
+    }
+    if (datum.cont_month == selectedMonth && (datum.cont_day >= selectedDay || datum.cont_day == "") && datum.month < selectedMonth) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay) {
 
   // clear out everything currently in the svg
   svg.select('g').remove()
 
-  let filteredFireData = fireData.filter((datum) => { return datum.year == selectedYear &&
-                                                             (
-                                                             ((datum.month <= selectedMonth && datum.cont_month >= selectedMonth) || (datum.month == selectedMonth && datum.day <= selectedDay)) ||
-                                                             ((datum.month <= selectedMonth && datum.cont_month >= selectedMonth) || (datum.cost_month == selectedMonth && datum.day <= selectedDay))
-                                                             )
-                                                             })
+  let filteredFireData = fireData.filter(callback)
+
   var fsizeTable = {}
 
   for (var i = 0; i < filteredFireData.length; i++)
