@@ -17,6 +17,20 @@ def load_data(fire_csv="datasets/fires.csv", aqi_csv="datasets/aqi.csv"):
     aqi['DATE'] = pd.to_datetime(aqi['DATE'])
     return fires, aqi
 
+def load_data_year(year):
+    # add dtype for FIRE_CODE to silence the warning
+    fires = pd.read_csv("datasets/fires.csv", dtype={"FIRE_CODE": str})
+    
+#     aqi = pd.read_csv(f"datasets/daily_aqi_by_county_{year}.csv", dtype= \
+#             {"DATE": object, "AQI": int})
+    aqi = pd.read_csv(f"datasets/daily_aqi_by_county_{year}.csv")
+    columns = ["FIRE_NAME", "FIRE_YEAR", "FIRE_SIZE", "DISCOVERY_DATE", "CONT_DATE", "STAT_CAUSE_DESCR", \
+               "STATE_NAME", "COUNTY_NAME", "STATE_CODE", "COUNTY_CODE"]
+    
+    fires = fires[columns]
+    aqi['DATE'] = pd.to_datetime(aqi['DATE'])
+    return fires, aqi
+
 
 def get_fires(df, state=None, county=None, year=None, date=None):
     fires = df
