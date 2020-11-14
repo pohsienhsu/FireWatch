@@ -21,6 +21,7 @@ var colorFireScale = d3.scaleQuantile()
 
 // enter code to define tooltip
 var tooltip = d3.select('body').append("div")
+  .attr("id", "tooltip-div")
   .attr("class", "tooltip")
   .style("opacity", 0);
 
@@ -31,7 +32,7 @@ var projection = d3.geoAlbersUsa()
   //  .center([0,20])
   .translate([width / 2, height / 2]);
 
-const formatDate = d3.timeFormat("%Y");
+const formatYear = d3.timeFormat("%Y");
 const formatMonth = d3.timeFormat("%m");
 const formatDay = d3.timeFormat("%d");
 
@@ -42,48 +43,22 @@ const parseYear = d3.timeParse("%Y");
 var states_json = [];
 var county_json = [];
 var fires_arr = [];
-var aqi_init_year_arr = [];
+// Aqi csv file takes a bit longer to read, so cache the data
+var aqi_data = {};
+var fire_yearly_data = {};
+
+var tooltip_data = [];
 
 // define any other global variables
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
   d3.json("datasets/counties.geo.json"),
-  d3.csv("datasets/fires.csv", (data) => {
-    return {
-      fire_code: data['FIRE_CODE'],
-      fire_name: data['FIRE_NAME'],
-      fire_year: data['FIRE_YEAR'],
-      fire_month: formatMonth(parseDate(data["DISCOVERY_DATE"])),
-      fire_day: formatDay(parseDate(data["DISCOVERY_DATE"])),
-      discovery_date: parseDate(data['DISCOVERY_DATE']),
-      /*discovery_doy: parseDate(data['DISCOVERY_DOY']),
-      discovery_time: parseDate(data['DISCOVERY_TIME']),*/
-      stat_cause_descr: parseDate(data['STAT_CAUSE_DESCR']),
-      continue_date: parseDate(data['CONT_DATE']),
-      /*continue_doy: parseDate(data['CONT_DOY']),
-      continue_time: parseDate(data['CONT_TIME']),*/
-      fire_size: data['FIRE_SIZE'],
-      fire_size_class: data['FIRE_SIZE_CLASS'],
-      lat: data['LATITUDE'],
-      long: data['LONGITUDE'],
-      /*owner_code: data['OWNER_CODE'],
-      owner_descr: data['OWNER_DESCR'],*/
-      county_dec: data['COUNTY'],
-      county_code: data['COUNTY_CODE'],
-      /*fips_name: data['FIPS_NAME'], */
-      state: data["STATE_NAME"],
-      county: data["COUNTY_NAME"],
-      state_code: data["STATE_CODE"]
-    }
-  })
 ]).then((values) => {
   // enter code to call ready() with required arguments
   states_json = values[0]
   county_json = values[1]
-  fires_arr = values[2]
-  ready(null, values[0], values[1], values[2]);
-  // ready(null, values[0], values[1])
+  ready(null, values[0], values[1]);
 }
 );
 
@@ -92,18 +67,12 @@ Promise.all([
 // county: topojson from counties.geo.json
 // fireData: data from fire_dates_fixed.csv
 var aqiData = [];
-function ready(error, state, county, fireData) {
-  // enter code to extract all unique games from fireDatas
-  let years = [];
+function ready(error, state, county) {
+  fireData = []
 
-  // really, the same for fires and aqi data
-  fireData.forEach((datum) => {
-    // console.log(datum.fire_year);
-    if (!years.includes(datum.fire_year)) {
-      years.push(datum.fire_year);
-    }
-  })
-  years.sort();
+  // List of years we are interested in
+  let years = [1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+               2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015]
 
   // enter code to append the years to the dropdown
   d3.select("#dropdown")
@@ -118,72 +87,160 @@ function ready(error, state, county, fireData) {
   d3.selectAll("input[name='map-type']").on("change", function() {
     radio_val = this.value
     button_pressed = 1
-    handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
-    createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
+    selectedYear = d3.select("#dropdown").property("value")
+    loadDataAndCreateMap(selectedYear, state, county, fireData)
+    //handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
+    //createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
   })
 
   // for default year
   selectedYear = years[0]
-  d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
-                 .then(function(data) {
-                   data.forEach(function(d) {
-                     d["fire_year"]= formatDate(parseDate(d["DATE"]));
-                     d["fire_month"] = formatMonth(parseDate(d["DATE"]));
-                     d["fire_day"] = formatDay(parseDate(d["DATE"]));
-                   });
-                   //console.log(data)
-                   //console.log(state, county, fireData, aqiData, selectedYear)
-                   aqiData = data
-                   handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
-                   // WARNING: Currently only for AQI data. Need to implement checkbox listener to see which data to present
-                   createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
-                 })
+  loadDataAndCreateMap(selectedYear, state, county, fireData)
 
   // event listener for the dropdown. Update choropleth and legend when selection changes. Call createMapAndLegend() with required arguments.
   d3.select("#dropdown").on("change", function (d) {
-     // for year selected in dropdown by user
-     var selectedYear = d3.select(this).property("value")
+    var selectedYear = d3.select(this).property("value")
+    loadDataAndCreateMap(selectedYear, state, county, fireData)
+  })
+}
 
-     if (radio_val == "airQuality") {
 
-       d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
-                    .then(function(data) {
-                      data.forEach(function(d) {
-                        d["fire_year"]= formatDate(parseDate(d["DATE"]));
-                        d["fire_month"] = formatMonth(parseDate(d["DATE"]));
-                        d["fire_day"] = formatDay(parseDate(d["DATE"]));
-                      });
-                      //console.log(data)
-                      aqiData = data
-                      console.log(state, county, fireData, aqiData, selectedYear)
-                      handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
-                      createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
-                    })
+function loadDataAndCreateMap(selectedYear, state, county, fireData) {
 
-    }
-    else {
-      // TODO: add specific handling for fires data
+  // for year selected in dropdown by user
+  if (radio_val == "airQuality") {
+
+    if (!(selectedYear in aqi_data)) {
+    d3.csv("datasets/daily_aqi_by_county_" + selectedYear + ".csv")
+      .then(function (data) {
+        data.forEach(function (d) {
+          d["year"] = formatYear(parseDate(d["DATE"]));
+          d["month"] = formatMonth(parseDate(d["DATE"]));
+          d["day"] = formatDay(parseDate(d["DATE"]));
+        });
+
+        aqiData = data
+        aqi_data[selectedYear] = data
+        handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
+        createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
+      })
+    } else {
+      aqiData = aqi_data[selectedYear]
       handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
       createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
     }
 
-  })
+  }
+  else {
+
+    // load additional averaging data for tooltip
+    d3.csv("datasets/fires_" + selectedYear + "_avgs.csv")
+      .then(function (data) {
+        console.log("tooltip_data")
+        console.log(data)
+        tooltip_data = data
+      })
+
+    if (!(selectedYear in fire_yearly_data)) {
+      d3.csv("datasets/fires_" + selectedYear + ".csv")
+        .then(function (data) {
+          data.forEach(function (d) {
+            d.fire_code = d['FIRE_CODE'];
+            d.fire_name = d['FIRE_NAME'];
+            d.year = d['FIRE_YEAR'];
+            d.month = formatMonth(parseDate(d["DISCOVERY_DATE"]));
+            d.day = formatDay(parseDate(d["DISCOVERY_DATE"]));
+            d.discovery_date = parseDate(d['DISCOVERY_DATE']);
+            /*d.discovery_doy: parseDate(d['DISCOVERY_DOY']),
+            d.discovery_time: parseDate(d['DISCOVERY_TIME']),*/
+            d.stat_cause_descr = parseDate(d['STAT_CAUSE_DESCR']);
+            d.cont_date = parseDate(d['CONT_DATE']);
+            d.cont_year = formatYear(parseDate(d['CONT_DATE']));
+            d.cont_month = formatMonth(parseDate(d['CONT_DATE']));
+            d.cont_day = formatDay(parseDate(d['CONT_DATE']));
+            /*d.continue_doy: parseDate(d['CONT_DOY']),
+            d.continue_time: parseDate(d['CONT_TIME']),*/
+            d.fire_size = d['FIRE_SIZE'];
+            d.fire_size_class = d['FIRE_SIZE_CLASS'];
+            d.lat = d['LATITUDE'];
+            d.long = d['LONGITUDE'];
+            /*d.owner_code: d['OWNER_CODE'],
+            d.owner_descr: d['OWNER_DESCR'],*/
+            d.county_dec = d['COUNTY'];
+            d.county_code = d['COUNTY_CODE'];
+            /*d.fips_name: d['FIPS_NAME'], */
+            d.state = d["STATE_NAME"];
+            d.county = d["COUNTY_NAME"];
+            d.state_code = d["STATE_CODE"];
+        });
+
+        fireData = data
+        fire_yearly_data[selectedYear] = data
+        handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
+        createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
+    })
+    } else {
+      fireData = fire_yearly_data[selectedYear]
+      handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
+      createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
+    }
+  }
 }
+
+var first = 0
+var curr_node = new Object()
 // helpers for tooltip
 function showtooltip(d, properties_dict) {
   tooltip.transition()
     .duration(200)
     .style("opacity", .8);
-  console.log(properties_dict["state"]);
-  console.log(properties_dict["county"]);
-  tooltip.html("<b>State</b>: " + properties_dict[d.properties.state] + "<br />"
-    + "<b>County</b>: " + properties_dict[d.properties.county] + "<br />")
-    .style("left", (d3.event.pageX + 20) + "px")
-    .style("top", (d3.event.pageY + 20) + "px");
+
+  var county_info = properties_dict[[d.properties.STATE, d.properties.COUNTY]]
+  if (radio_val == "airQuality") {
+    if (county_info !== undefined) {
+      tooltip.html("<b>State</b>: " + county_info[0]+ "<br />"
+        + "<b>County</b>: " + county_info[1] + "<br />"
+        + "<b>Defining Parameter</b>: " + county_info[2] + "<br />"
+        + "<b>Category</b>: " + county_info[3] + "<br />"
+        + "<b>AQI</b>: " + county_info[4] + "<br />")
+        .style("left", (d3.event.pageX + 20) + "px")
+        .style("top", (d3.event.pageY + 20) + "px");
+     } else {
+       tooltip.html("<b>No available data for this county</b><br />")
+       .style("left", (d3.event.pageX + 20) + "px")
+       .style("top", (d3.event.pageY + 20) + "px");
+     }
+   } else {
+      let filteredTooltipData = tooltip_data.filter((datum) => { return d.properties.STATE == datum.STATE_CODE &&
+                                                                     d.properties.COUNTY == datum.COUNTY_CODE })[0]
+      if (filteredTooltipData !== undefined) {
+        var geo_names = properties_dict[[d.properties.STATE, d.properties.COUNTY]]
+        tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
+                      + "<b>County</b>: " + geo_names[1] + "<br />"
+                      + "<b>Average Fire Size</b>: " + filteredTooltipData.AVG_FIRE_SIZE + "<br />"
+                      + "<b>Most Common Cause</b>: " + filteredTooltipData.MOST_COMMON_CAUSE + "<br />")
+          .style("left", (d3.event.pageX + 20) + "px")
+          .style("top", (d3.event.pageY + 20) + "px");
+
+          d3.xml("analysis_plots/state_level_monthly_paired_view/monthly_paired_view_avg_" + county_info[0]+ ".svg")
+          .then((data)=> {
+            if (first == 1) {
+              tooltip.select("svg").html("")
+            }
+
+            curr_node = tooltip.node().appendChild(data.documentElement);
+            first = 1
+          });
+      } else {
+        tooltip.html("<b>No available data for this county</b><br />")
+        .style("left", (d3.event.pageX + 20) + "px")
+        .style("top", (d3.event.pageY + 20) + "px");
+      }
+    }
 }
+
 function movetooltip(d) {
-  tooltip
-    .style("left", (d3.event.pageX + 20) + "px")
+  tooltip.style("left", (d3.event.pageX + 20) + "px")
     .style("top", (d3.event.pageY + 20) + "px");
 }
 function hidetooltip(d) {
@@ -195,12 +252,12 @@ function hidetooltip(d) {
 function parseDays(filteredData) {
   d3.select("#dropdown_day").html("")
 
-  let filteredDataByMonth = filteredData.filter((datum) => { return parseInt(datum.fire_month) === parseInt(selectedMonth) })
+  let filteredDataByMonth = filteredData.filter((datum) => { return parseInt(datum.month) === parseInt(selectedMonth) })
   let days = [];
   filteredDataByMonth.forEach((datum) => {
-    // console.log(datum.fire_days);
-    if (!days.includes(datum.fire_day)) {
-      days.push(datum.fire_day);
+    // console.log(datum.day);
+    if (!days.includes(datum.day)) {
+      days.push(datum.day);
     }
   })
   days.sort();
@@ -217,8 +274,8 @@ function parseDays(filteredData) {
 }
 
 function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
-  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
-  let filteredFireData = fireData.filter((datum) => { return datum.discovery_date.getFullYear() === parseInt(selectedYear) })
+  let filteredAqiData
+  let filteredFireData
   let months = [];
   d3.select("#dropdown_month").html("")
   d3.select("#dropdown_day").html("")
@@ -226,20 +283,23 @@ function handleMonthAndDay(state, county, fireData, aqiData, selectedYear) {
   console.log("radio_val")
   console.log(radio_val)
  if (radio_val == "airQuality") {
+   filteredAqiData = aqiData.filter((datum) => { return datum.year == selectedYear })
    filteredAqiData.forEach((datum) => {
-     //console.log(datum.fire_month);
-     if (!months.includes(datum.fire_month)) {
-       months.push(datum.fire_month);
+     //console.log(datum.month);
+     if (!months.includes(datum.month)) {
+       months.push(datum.month);
      }
    })
    months.sort();
    selectedMonth = parseInt(months[0])
  }
  else {
+   console.log(datum.year + " " + selectedYear)
+   filteredFireData = fireData.filter((datum) => { return datum.year == selectedYear })
    filteredFireData.forEach((datum) => {
-     //console.log(datum.fire_month);
-     if (!months.includes(datum.fire_month)) {
-       months.push(datum.fire_month);
+     //console.log(datum.month);
+     if (!months.includes(datum.month)) {
+       months.push(datum.month);
      }
    })
    months.sort();
@@ -286,55 +346,28 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   // clear out everything currently in the svg
   svg.select('g').remove()
 
-  // reset on change jic aqi data not present for that day.
-  /*if (button_pressed == 1) {
-    selectedYear = 1992
-    selectedMonth = 01
-    selecedtDay = 01
-  }*/
+  let filteredAqiData = aqiData.filter((datum) => {
+                                                          return datum.year == selectedYear  &&
+                                                          datum.month == selectedMonth  &&
+                                                          datum.day == selectedDay})
 
-  let filteredAqiData = aqiData.filter((datum) => { return parseDate(datum["DATE"]).getFullYear() === parseInt(selectedYear) })
+  var aqiTable = {}
 
-  // this is for the year aqi avg reading
-  // we are doing it by day now
-  /*var avgAqiPerYearData = d3.nest()
-                            .key(function(d) {return d["STATE_CODE"} ]})
-                            .key(function(d) {return d["COUNTY_CODE"} ]})
-                            .rollup(function(v) { return d3.mean(v, function(d) { return d.AQI })})
-                            .entries(filteredAqiData)*/
+  for (var i = 0; i < filteredAqiData.length; i++)
+  {
+    datum = filteredAqiData[i]
+    aqiTable[[datum.STATE_CODE, datum.COUNTY_CODE]] = datum.AQI
+  }
 
-  // NOTE: using filteredAqiData not aqiData here to get range by year.
-  // change this to aqiData, ... if you want to make one universal color domain
-  // i.e. within the yearly AQI range, how did this day do.
   colorScale.domain(d3.extent(filteredAqiData, function (d) { return d["AQI"]; }))
 
-  // only consider data for selectedGame
-  // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
   // mapping from each county to its properties
-  let properties_dict = {}
-  fireData.forEach((datum) => {
-    properties_dict["state"] = datum.state;
-    properties_dict["county"] = datum.state;
+  var properties_dict = {}
+  filteredAqiData.forEach((datum) => {
+    properties_dict[[datum.STATE_CODE, datum.COUNTY_CODE]] = [datum.STATE_NAME, datum.COUNTY_NAME, datum.DEFINING_PARAMETER,datum.CATEGORY,datum.AQI]
   })
-  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
 
-  // add states
-  svg.append("g")
-    .selectAll("path")
-    .data(state.features)
-    .enter()
-    .append("path")
-    .attr("d", d3.geoPath().projection(projection))
-    .attr("id", function (d) {
-      return d.properties.NAME10;
-    })
-    .attr("fill", '#696969')
-    .attr("stroke", "white")
-    .attr("stroke-width", "2px")
-    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
-    // .on("mousemove", (d) => { movetooltip(d) })
-    // .on("mouseleave", (d) => { hidetooltip(d) });
-
+  console.log("Before")
   // add counties
   svg.append("g")
     .selectAll("path")
@@ -349,28 +382,20 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
        var county_code = d.properties.COUNTY
        var county_name = d.properties.NAME
 
-       for (var i = 0; i < filteredAqiData.length; i++)
-       {
-         if (filteredAqiData[i]["COUNTY_NAME"] == county_name && filteredAqiData[i]["COUNTY_CODE"] == county_code && filteredAqiData[i]["STATE_CODE"] == state_code)
-         {
-           var yr = parseInt(filteredAqiData[i].fire_year)
-           var m = parseInt(filteredAqiData[i].fire_month)
-           var d = parseInt(filteredAqiData[i].fire_day)
-           if (yr == selectedYear && m == selectedMonth && d == selectedDay)
-           {
-             return colorScale(filteredAqiData[i]["AQI"])
-           }
-         }
+       if ([state_code, county_code] in aqiTable) {
+           return colorScale(aqiTable[[state_code, county_code]])
        }
+
        return "grey";
     })
     .attr("id", function (d) {
       return d.properties.NAME;
     })
-    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
-    // .on("mousemove", (d) => { movetooltip(d) })
-    // .on("mouseleave", (d) => { hidetooltip(d) });
+    .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
+    .on("mousemove", (d) => { movetooltip(d) })
+    .on("mouseleave", (d) => { hidetooltip(d) });
 
+  console.log("After")
   //also add the legend
   svg.append("g")
      .attr("class", "legend")
@@ -383,73 +408,35 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
 }
 
 function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay) {
-  // let states = []
-  // fireData.forEach((datum) => {
-  //   if(!states.includes(datum.state)) {
-  //     states.push(datum.state)
-  //   }
-  // })
-
-  // let counties = []
-  // fireData.forEach((datum) => {
-  //   if(!counties.includes(datum.county)) {
-  //     counties.push(datum.county)
-  //   }
-  // })
 
   // clear out everything currently in the svg
   svg.select('g').remove()
 
-  // reset on change jic fires data not present for that day.
-  /*if (button_pressed == 1) {
-    selectedYear = 1992
-    selectedMonth = 01
-    selecedtDay = 01
-  }*/
+  let filteredFireData = fireData.filter((datum) => { return datum.year == selectedYear &&
+                                                             (
+                                                             ((datum.month <= selectedMonth && datum.cont_month >= selectedMonth) || (datum.month == selectedMonth && datum.day <= selectedDay)) ||
+                                                             ((datum.month <= selectedMonth && datum.cont_month >= selectedMonth) || (datum.cost_month == selectedMonth && datum.day <= selectedDay))
+                                                             )
+                                                             })
+  var fsizeTable = {}
 
-  let filteredFireData = fireData.filter((datum) => { return parseInt(datum.fire_year) === parseInt(selectedYear) })
+  for (var i = 0; i < filteredFireData.length; i++)
+  {
+    datum = filteredFireData[i]
+    fsizeTable[[datum.state_code, datum.county_code]] = datum.fire_size
+  }
 
-  console.log("filteredFireData")
-  console.log(filteredFireData)
-  // this is for the year aqi avg reading
-  // we are doing it by day now
-  /*var avgAqiPerYearData = d3.nest()
-                            .key(function(d) {return d["STATE_CODE"} ]})
-                            .key(function(d) {return d["COUNTY_CODE"} ]})
-                            .rollup(function(v) { return d3.mean(v, function(d) { return d.AQI })})
-                            .entries(filteredAqiData)*/
-
-  // NOTE: using filteredAqiData not aqiData here to get range by year.
-  // change this to aqiData, ... if you want to make one universal color domain
-  // i.e. within the yearly AQI range, how did this day do.
   colorFireScale.domain(d3.extent(filteredFireData, function (d) { return d.fire_size ; }))
 
   // only consider data for selectedGame
   // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
   // mapping from each county to its properties
   let properties_dict = {}
-  fireData.forEach((datum) => {
-    properties_dict["state"] = datum.state;
-    properties_dict["county"] = datum.state;
+  filteredFireData.forEach((datum) => {
+    properties_dict[[datum.STATE_CODE, datum.COUNTY_CODE]] = [datum.STATE_NAME, datum.COUNTY_NAME]
   })
-  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.fire_year); }))
+  // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
-  // add states
-  svg.append("g")
-    .selectAll("path")
-    .data(state.features)
-    .enter()
-    .append("path")
-    .attr("d", d3.geoPath().projection(projection))
-    .attr("id", function (d) {
-      return d.properties.NAME10;
-    })
-    .attr("fill", '#696969')
-    .attr("stroke", "white")
-    .attr("stroke-width", "2px")
-    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
-    // .on("mousemove", (d) => { movetooltip(d) })
-    // .on("mouseleave", (d) => { hidetooltip(d) });
 
   // add counties
   svg.append("g")
@@ -465,27 +452,17 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
        var county_code = d.properties.COUNTY
        var county_name = d.properties.NAME
 
-       for (var i = 0; i < filteredFireData.length; i++)
-       {
-         if (parseInt(filteredFireData[i].county_code) == county_code && parseInt(filteredFireData[i].state_code) == state_code)
-         {
-           var yr = parseInt(filteredFireData[i].fire_year)
-           var m = parseInt(filteredFireData[i].fire_month)
-           var d = parseInt(filteredFireData[i].fire_day)
-           if (yr == selectedYear && m == selectedMonth && d == selectedDay)
-           {
-             return colorFireScale(filteredFireData[i].fire_size)
-           }
-         }
+       if ([state_code, county_code] in fsizeTable) {
+           return colorFireScale(fsizeTable[[state_code, county_code]])
        }
        return "grey";
     })
     .attr("id", function (d) {
       return d.properties.NAME;
     })
-    // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
-    // .on("mousemove", (d) => { movetooltip(d) })
-    // .on("mouseleave", (d) => { hidetooltip(d) });
+    .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
+    .on("mousemove", (d) => { movetooltip(d) })
+    .on("mouseleave", (d) => { hidetooltip(d) });
 
   //also add the legend
   svg.append("g")
