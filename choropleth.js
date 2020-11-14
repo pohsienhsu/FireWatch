@@ -49,7 +49,7 @@ var aqi_data = {};
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
-  d3.json("datasets/counties.geo.json"),
+  d3.json("datasets/us-albers-counties.json"),
 ]).then((values) => {
   // enter code to call ready() with required arguments
   states_json = values[0]
@@ -312,7 +312,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   for (var i = 0; i < filteredAqiData.length; i++)
   {
     datum = filteredAqiData[i]
-    aqiTable[[datum.STATE_CODE, datum.COUNTY_CODE]] = datum.AQI
+    aqiTable[datum.STATE_CODE+datum.COUNTY_CODE] = datum.AQI
   }
 
 
@@ -333,21 +333,21 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
 
   console.log("Before")
   // add counties
-  svg.append("g")
+  var geojson = topojson.feature(county, county.objects.collection);
+
+  svg.append('g')
     .selectAll("path")
-    .data(county.features)
-    .enter()
-    .append("path")
+    .data(geojson.features)
+    .enter().append("path")
     .attr("d", d3.geoPath().projection(projection))
+    .attr("fill", "gray")
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
     .attr("fill", function(d) {
-       var state_code = d.properties.STATE
-       var county_code = d.properties.COUNTY
-       var county_name = d.properties.NAME
-        
-       if ([state_code, county_code] in aqiTable) {
-           return colorScale(aqiTable[[state_code, county_code]])
+       var fips = d.properties.fips
+
+       if (fips in aqiTable) {
+           return colorScale(aqiTable[fips])
        }
 
        return "grey";
@@ -355,6 +355,9 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     .attr("id", function (d) {
       return d.properties.NAME;
     })
+
+
+
     // .on("mouseenter", (d) => { showtooltip(d, properties_dict) })
     // .on("mousemove", (d) => { movetooltip(d) })
     // .on("mouseleave", (d) => { hidetooltip(d) });
@@ -380,6 +383,16 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
                                                              datum.month == selectedMonth &&
                                                              datum.day == selectedDay })
 
+
+  var fireTable = {}
+
+  for (var i = 0; i < filteredFireData.length; i++)
+  {
+    datum = filteredFireData[i]
+    fireTable[datum.STATE_CODE+datum.COUNTY_CODE] = datum.fire_size
+  }
+
+
   // this is for the year aqi avg reading
   // we are doing it by day now
   /*var avgAqiPerYearData = d3.nest()
@@ -403,35 +416,25 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
+  var geojson = topojson.feature(county, county.objects.collection);
 
   console.log("Hello")
   // add counties
   svg.append("g")
     .selectAll("path")
-    .data(county.features)
+    .data(geojson.features)
     .enter()
     .append("path")
     .attr("d", d3.geoPath().projection(projection))
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
     .attr("fill", function(d) {
-       var state_code = d.properties.STATE
-       var county_code = d.properties.COUNTY
-       var county_name = d.properties.NAME
+       var fips = d.properties.fips
 
-       for (var i = 0; i < filteredFireData.length; i++)
-       {
-         if (parseInt(filteredFireData[i].county_code) == county_code && parseInt(filteredFireData[i].state_code) == state_code)
-         {
-           var yr = parseInt(filteredFireData[i].year)
-           var m = parseInt(filteredFireData[i].month)
-           var d = parseInt(filteredFireData[i].day)
-           if (yr == selectedYear && m == selectedMonth && d == selectedDay)
-           {
-             return colorFireScale(filteredFireData[i].fire_size)
-           }
-         }
+       if (fips in fireTable) {
+           return colorFireScale(fireTable[fips])
        }
+
        return "grey";
     })
     .attr("id", function (d) {
