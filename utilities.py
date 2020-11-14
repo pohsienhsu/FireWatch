@@ -146,4 +146,3 @@ def get_aqi_avg(aqi, row, days, year=None):
         return None
 
     return avg_aqi
->>>>>>> 7cf5c3942c5f1f54bda234f180546ab591081e8e

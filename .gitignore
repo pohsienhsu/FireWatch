@@ -4,3 +4,5 @@ fires.csv
 aqi.csv
 .ipynb_checkpoints/
 counties_latLong.csv
+__pycache__/
+fire_case_analysis/
