@@ -13,8 +13,8 @@ var svg = d3.select("#choropleth").append("svg")
   .attr("height", height);
 
 // enter code to create color scale
-var colorScale = d3.scaleQuantile()
-  .range(d3.schemeBlues[4]);
+var colorScale = d3.scaleThreshold()
+  .range(["grey", "green", "yellow", "orange", "red", "purple", "maroon"]);
 
 var colorFireScale = d3.scaleQuantile()
   .range(d3.schemeReds[4]);
@@ -214,7 +214,7 @@ function showtooltip(d, properties_dict) {
        .style("top", (d3.event.pageY + 20) + "px");
      }
    } else {
-      let filteredTooltipData = tooltip_data.filter( function (datum) { 
+      let filteredTooltipData = tooltip_data.filter( function (datum) {
             fips = datum.STATE_CODE.padStart(2, '0') + datum.COUNTY_CODE.padStart(3, '0')
             return d.properties.fips == fips })[0]
 
@@ -364,7 +364,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     aqiTable[datum.STATE_CODE + datum.COUNTY_CODE] = datum.AQI
   }
 
-  colorScale.domain(d3.extent(filteredAqiData, function (d) { return d["AQI"]; }))
+  colorScale.domain([0,50, 100, 150, 200, 300])
 
   // mapping from each county to its properties
   var properties_dict = {}
@@ -406,12 +406,14 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   var legend = d3.legendColor()
               .scale(colorScale)
               .title("AQI Level Legend")
+              .labels(["N/A", "Good (0 to 50)", "Moderate (51 to 100)", "Unhealthy for Sensitive Groups (101 to 150)", "Unhealthy (151 to 200)", "Very Unhealthy (201 to 300)", "Hazardous (301 and higher)"])
+              //.labels(d3.legendHelpers.thresholdLabels)
               .labelFormat(d3.format('.2f'));
   d3.select(".legend").call(legend);
 }
 
 function callback(datum, selectedYear, selectedMonth, selectedDay) {
-  
+
 
   if (datum.year == selectedYear) {
     if (datum.month < selectedMonth && datum.cont_month > selectedMonth)  {
@@ -440,8 +442,8 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   svg.select('g').remove()
 
   // Pass selectedYear, selectedMonth, and selectedDay to callback function otherwise it uses the wrong values from the global variables
-  let filteredFireData = fireData.filter(function(d) { 
-       return callback(d, selectedYear, selectedMonth, selectedDay) 
+  let filteredFireData = fireData.filter(function(d) {
+       return callback(d, selectedYear, selectedMonth, selectedDay)
   })
 
   var fsizeTable = {}
