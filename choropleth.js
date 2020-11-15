@@ -174,6 +174,7 @@ function loadDataAndCreateMap(selectedYear, state, county, fireData) {
             d.state = d["STATE_NAME"];
             d.county = d["COUNTY_NAME"];
             d.state_code = d["STATE_CODE"];
+            d.fips = d.STATE_CODE.padStart(2, '0') + d.COUNTY_CODE.padStart(3, '0')
         });
 
         fireData = data
@@ -213,12 +214,12 @@ function showtooltip(d, properties_dict) {
        .style("top", (d3.event.pageY + 20) + "px");
      }
    } else {
-      // To-Do: Need to fix this.  Would be cleaner to update the fire avg files so that the columns are strings and not
-      // ints so that concatenating state code with county code yields a 5-digit string.  (leading zeros are not stripped away)
-      let filteredTooltipData = tooltip_data.filter((datum) => { return d.properties.STATE == datum.STATE_CODE &&
-                                                                     d.properties.COUNTY == datum.COUNTY_CODE })[0]
-      if (filteredTooltipData !== undefined) {
-        var geo_names = properties_dict[d.fips]
+      let filteredTooltipData = tooltip_data.filter( function (datum) { 
+            fips = datum.STATE_CODE.padStart(2, '0') + datum.COUNTY_CODE.padStart(3, '0')
+            return d.properties.fips == fips })[0]
+
+      var geo_names = properties_dict[d.properties.fips]
+      if (filteredTooltipData !== undefined && geo_names !== undefined) {
         tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
                       + "<b>County</b>: " + geo_names[1] + "<br />"
                       + "<b>Average Fire Size</b>: " + filteredTooltipData.AVG_FIRE_SIZE + "<br />"
@@ -439,14 +440,16 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   svg.select('g').remove()
 
   // Pass selectedYear, selectedMonth, and selectedDay to callback function otherwise it uses the wrong values from the global variables
-  let filteredFireData = fireData.filter(function(d) { return callback(d, selectedYear, selectedMonth, selectedDay) })
+  let filteredFireData = fireData.filter(function(d) { 
+       return callback(d, selectedYear, selectedMonth, selectedDay) 
+  })
 
   var fsizeTable = {}
 
   for (var i = 0; i < filteredFireData.length; i++)
   {
     datum = filteredFireData[i]
-    fsizeTable[datum.state_code + datum.county_code] = datum.fire_size
+    fsizeTable[datum.fips] = datum.fire_size
   }
 
   colorFireScale.domain(d3.extent(filteredFireData, function (d) { return d.fire_size ; }))
@@ -456,7 +459,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   // mapping from each county to its properties
   let properties_dict = {}
   filteredFireData.forEach((datum) => {
-    properties_dict[datum.STATE_CODE + datum.COUNTY_CODE] = [datum.STATE_NAME, datum.COUNTY_NAME]
+    properties_dict[datum.fips] = [datum.STATE_NAME, datum.COUNTY_NAME]
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
