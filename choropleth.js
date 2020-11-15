@@ -30,7 +30,7 @@ var path = d3.geoPath();
 var projection = d3.geoAlbersUsa()
   .scale(1200)
   //  .center([0,20])
-  .translate([width / 2, height / 2]);
+  .translate([width / 2.75, height / 2]);
 
 const formatYear = d3.timeFormat("%Y");
 const formatMonth = d3.timeFormat("%m");
@@ -402,7 +402,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   //also add the legend
   svg.append("g")
      .attr("class", "legend")
-     .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
+     .attr("transform", "translate(" + (width - 300) + ", " + 20 + ")");
   var legend = d3.legendColor()
               .scale(colorScale)
               .title("AQI Level Legend")
