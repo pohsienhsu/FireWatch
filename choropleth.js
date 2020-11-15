@@ -53,7 +53,7 @@ var tooltip_data = [];
 Promise.all([
   // enter code to read files
   d3.json("datasets/state.geo.json"),
-  d3.json("datasets/counties.geo.json"),
+  d3.json("datasets/us-albers-counties.json"),
 ]).then((values) => {
   // enter code to call ready() with required arguments
   states_json = values[0]
@@ -100,6 +100,7 @@ function ready(error, state, county) {
   // event listener for the dropdown. Update choropleth and legend when selection changes. Call createMapAndLegend() with required arguments.
   d3.select("#dropdown").on("change", function (d) {
     var selectedYear = d3.select(this).property("value")
+    console.log(selectedYear)
     loadDataAndCreateMap(selectedYear, state, county, fireData)
   })
 }
@@ -142,6 +143,7 @@ function loadDataAndCreateMap(selectedYear, state, county, fireData) {
       })
 
     if (!(selectedYear in fire_yearly_data)) {
+      console.log("loading from data for year " + selectedYear)
       d3.csv("datasets/fires_" + selectedYear + ".csv")
         .then(function (data) {
           data.forEach(function (d) {
@@ -195,7 +197,7 @@ function showtooltip(d, properties_dict) {
     .duration(200)
     .style("opacity", .8);
 
-  var county_info = properties_dict[[d.properties.STATE, d.properties.COUNTY]]
+  var county_info = properties_dict[d.properties.fips]
   if (radio_val == "airQuality") {
     if (county_info !== undefined) {
       tooltip.html("<b>State</b>: " + county_info[0]+ "<br />"
@@ -211,10 +213,12 @@ function showtooltip(d, properties_dict) {
        .style("top", (d3.event.pageY + 20) + "px");
      }
    } else {
+      // To-Do: Need to fix this.  Would be cleaner to update the fire avg files so that the columns are strings and not
+      // ints so that concatenating state code with county code yields a 5-digit string.  (leading zeros are not stripped away)
       let filteredTooltipData = tooltip_data.filter((datum) => { return d.properties.STATE == datum.STATE_CODE &&
                                                                      d.properties.COUNTY == datum.COUNTY_CODE })[0]
       if (filteredTooltipData !== undefined) {
-        var geo_names = properties_dict[[d.properties.STATE, d.properties.COUNTY]]
+        var geo_names = properties_dict[d.fips]
         tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
                       + "<b>County</b>: " + geo_names[1] + "<br />"
                       + "<b>Average Fire Size</b>: " + filteredTooltipData.AVG_FIRE_SIZE + "<br />"
@@ -356,7 +360,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   for (var i = 0; i < filteredAqiData.length; i++)
   {
     datum = filteredAqiData[i]
-    aqiTable[[datum.STATE_CODE, datum.COUNTY_CODE]] = datum.AQI
+    aqiTable[datum.STATE_CODE + datum.COUNTY_CODE] = datum.AQI
   }
 
   colorScale.domain(d3.extent(filteredAqiData, function (d) { return d["AQI"]; }))
@@ -364,26 +368,25 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   // mapping from each county to its properties
   var properties_dict = {}
   filteredAqiData.forEach((datum) => {
-    properties_dict[[datum.STATE_CODE, datum.COUNTY_CODE]] = [datum.STATE_NAME, datum.COUNTY_NAME, datum.DEFINING_PARAMETER,datum.CATEGORY,datum.AQI]
+    properties_dict[datum.STATE_CODE + datum.COUNTY_CODE] = [datum.STATE_NAME, datum.COUNTY_NAME, datum.DEFINING_PARAMETER,datum.CATEGORY,datum.AQI]
   })
 
-  console.log("Before")
+  var geojson = topojson.feature(county, county.objects.collection);
+
   // add counties
   svg.append("g")
     .selectAll("path")
-    .data(county.features)
+    .data(geojson.features)
     .enter()
     .append("path")
     .attr("d", d3.geoPath().projection(projection))
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
     .attr("fill", function(d) {
-       var state_code = d.properties.STATE
-       var county_code = d.properties.COUNTY
-       var county_name = d.properties.NAME
+       var fips = d.properties.fips
 
-       if ([state_code, county_code] in aqiTable) {
-           return colorScale(aqiTable[[state_code, county_code]])
+       if (fips in aqiTable) {
+           return colorScale(aqiTable[fips])
        }
 
        return "grey";
@@ -395,7 +398,6 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
     .on("mousemove", (d) => { movetooltip(d) })
     .on("mouseleave", (d) => { hidetooltip(d) });
 
-  console.log("After")
   //also add the legend
   svg.append("g")
      .attr("class", "legend")
@@ -407,7 +409,9 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   d3.select(".legend").call(legend);
 }
 
-function callback(datum) {
+function callback(datum, selectedYear, selectedMonth, selectedDay) {
+  
+
   if (datum.year == selectedYear) {
     if (datum.month < selectedMonth && datum.cont_month > selectedMonth)  {
       return true;
@@ -434,14 +438,15 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   // clear out everything currently in the svg
   svg.select('g').remove()
 
-  let filteredFireData = fireData.filter(callback)
+  // Pass selectedYear, selectedMonth, and selectedDay to callback function otherwise it uses the wrong values from the global variables
+  let filteredFireData = fireData.filter(function(d) { return callback(d, selectedYear, selectedMonth, selectedDay) })
 
   var fsizeTable = {}
 
   for (var i = 0; i < filteredFireData.length; i++)
   {
     datum = filteredFireData[i]
-    fsizeTable[[datum.state_code, datum.county_code]] = datum.fire_size
+    fsizeTable[datum.state_code + datum.county_code] = datum.fire_size
   }
 
   colorFireScale.domain(d3.extent(filteredFireData, function (d) { return d.fire_size ; }))
@@ -451,27 +456,26 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   // mapping from each county to its properties
   let properties_dict = {}
   filteredFireData.forEach((datum) => {
-    properties_dict[[datum.STATE_CODE, datum.COUNTY_CODE]] = [datum.STATE_NAME, datum.COUNTY_NAME]
+    properties_dict[datum.STATE_CODE + datum.COUNTY_CODE] = [datum.STATE_NAME, datum.COUNTY_NAME]
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
+  var geojson = topojson.feature(county, county.objects.collection);
 
   // add counties
   svg.append("g")
     .selectAll("path")
-    .data(county.features)
+    .data(geojson.features)
     .enter()
     .append("path")
     .attr("d", d3.geoPath().projection(projection))
     .attr("stroke", "#A9A9A9")
     .attr("stroke-width", "0.6px")
     .attr("fill", function(d) {
-       var state_code = d.properties.STATE
-       var county_code = d.properties.COUNTY
-       var county_name = d.properties.NAME
+       var fips = d.properties.fips
 
-       if ([state_code, county_code] in fsizeTable) {
-           return colorFireScale(fsizeTable[[state_code, county_code]])
+       if (fips in fsizeTable) {
+           return colorFireScale(fsizeTable[fips])
        }
        return "grey";
     })
