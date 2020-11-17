@@ -10,21 +10,13 @@
     <link rel="icon" href="images/favicon.ico">
     <link rel="canonical" href="https://getbootstrap.com/docs/3.3/examples/starter-template/">
 
-    <title>Air Pollution Visualizer</title>
+    <title>Analysis</title>
 
     <!-- Bootstrap core CSS -->
     <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
 
     <!-- Custom styles for this template -->
     <link href="local_styles.css" rel="stylesheet">
-
-    <!-- D3 Source JS, may need to add more than this later -->
-    <script type="text/javascript" src="lib/d3.v5.min.js"></script>
-    <script type="text/javascript" src="lib/d3-geo-projection.v2.min.js"></script>
-    <script type="text/javascript" src="lib/d3-legend.min.js"></script>
-    <script type="text/javascript" src="lib/d3-tip.min.js"></script>
-    <script type="text/javascript" src="lib/topojson.v2.min.js"></script>
-    <script type="text/javascript" src="https://d3js.org/d3-array.v2.min.js"></script>
 
   </head>
 
@@ -44,7 +36,7 @@
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
               <li><a href="#map">Map</a></li>
-              <li><a href="analysis.html" target="_top">Analysis</a></li>
+              <li><a href="#analysis">Analysis</a></li>
               <li><a href="#discussion">Discussion</a></li>
               <li><a href="#conclusion">Conclusion</a></li>
             </ul>
@@ -55,34 +47,13 @@
 
     <!-- Dropdown and Toggles -->
     <div class="container mt-5">
-      <section id="map">
-        <div>
-          <p style='display:inline-block;margin-left:5%;margin-top: 50pt'>Select Year: </p>
-          <select id="dropdown"></select>
-          <p style='display:inline-block;margin-left:5%;margin-top: 50pt'>Select Month: </p>
-          <select id="dropdown_month"></select>
-          <p style='display:inline-block;margin-left:5%;margin-top: 50pt'>Select Day: </p>
-          <select id="dropdown_day"></select>
-          <input type="radio" id="airQualityButton" name="map-type" value="airQuality" autocomplete="off" checked style='margin-left:10%'>
-          <label for="airQualityButton">  Air Quality (PPM)  </label>
-    <input type="radio" id="fireButton" name="map-type" value="fires" autocomplete="off" style='margin-left:5%'>
-    <label for="fireButton">Fire</label>
-          <!--<input type="checkbox" name="airQualityCheckbox" checked style='margin-left:10%'>
-          <label for="airQualityCheckbox">Air Quality (PPM)</label>
-          <input type="checkbox" name="fireCheckbox" checked style='margin-left:5%'>
-          <label for="fireCheckbox">Fire</label>-->
-        </div>
-        <!-- append visualization svg to this div-->
-        <div id="choropleth" class = "centered"></div>
-        <!--<blockquote class="blockquote text-center">
-          <p class="mb-0">Our visualizer pulls from ....</p>
-        </blockquote> -->
-      </section>
+        <BR></BR>
+      	<BR></BR>
+      	<BR></BR>
 
-      <!--<section id="analysis">
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Data Analysis Section</p>
-        </blockquote>
+	    <blockquote class="blockquote text-center">
+          <p class="mb-2" style="font-weight:bold">Data Analysis</p>
+        </blockquote style="bottom:-30px">
         <p span style="text-align:center;font-weight:bold">  Monthly Paired Data Analysis (Acres Burned) </p>
         <div id="content">
         	<img class="wrap" src="analysis_plots/monthly_paired_view_sharey_True.svg" height="500" width="500"/>
@@ -120,7 +91,7 @@
             <BR></BR>
             <BR></BR>
       		<img class="wrap" src="Yearly AQI Plots and Clustering/explained_variance_sample.png" height="250" width="250"/>
-      		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="350"/>
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
 			<BR><figcaption>PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. </figcaption><BR clear="left">
         	<BR></BR>
         	<BR></BR>
@@ -129,31 +100,14 @@
             <BR></BR>
             <BR></BR>
             <img class="wrap" src="Yearly AQI Plots and Clustering/kmeans_2d.png" height="500" width="500"/>
-            <img class="wrap4" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="350"/>
+            <img class="wrap4" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
             <BR></BR>
             <BR></BR>
         	<figure>
             	<BR><figcaption>Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. (Can add more analysis here...) </figcaption><BR clear="left">
 			</figure>
-      </section>-->
-
-      <section id="discussion">
-        <BR></BR>
-        <BR></BR>
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Talk about the findings...</p>
-        </blockquote>
-      </section>
-
-      <section id="conclusion">
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Conclusion: Smoke is bad</p>
-        </blockquote>
-      </section>
     </div>
 
-    <!-- our javascript files -->
-    <script src="choropleth.js"></script>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
