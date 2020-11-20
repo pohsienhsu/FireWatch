@@ -39,7 +39,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
           </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
@@ -81,7 +81,22 @@
       <BR></BR>
       <p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Sum vs. AQI) </p>
       		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/AQI&Fire_Sum Correlation/corr_Month.svg" height="500" width="500"/>
-         	<BR><figcaption>These analysis plots show yearly correlation between AQI and fire sum. (Can add more analysis here...)</figcaption><BR clear="left">
+         	<BR>
+         	<pre style="white-space:pre-wrap">
+Brief: These analysis plots show a yearly data for a per month correlation between AQI and fire sum. 
+
+Input Features: 
+    	  		
+Output Features: FIRE_SUM, AQI
+
+Types: Scatterplots
+
+Packages: sklearn, seaborn, matplotlib, numpy, pandas
+
+Description: These analysis plots show a yearly data for a per month correlation between AQI and fire sum. Considering AQI isn’t changing simultaneously with the occurrence of wildfires, we measure the monthly average of AQI with respect to wildfire sum. Wildfire sum equals to fire size * the duration of the fires for better addressing the delay effect of wildfire on AQI. From the parity plots, it is shown that most wildfires have smaller effect on AQI than anticipated. So there should be other "main" factors increasing AQI such as gasoline combustion and factory gas emission.  
+
+	</pre>
+         	<BR clear="left">
     </div>
     <!-- our javascript files -->
     <!-- <script src="choropleth.js"></script> -->

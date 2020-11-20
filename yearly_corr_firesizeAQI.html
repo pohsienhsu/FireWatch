@@ -39,7 +39,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
           </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
@@ -80,8 +80,19 @@
       <BR></BR>
       <BR></BR>
       <p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Size vs. Average AQI) </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
-			<BR><figcaption>These analysis plots show the yearly correlation between average AQI (measured over each fire's duration) and the size of each fire over the range of dates (i.e. 1992-2015). They provide slightly different results from the fire sum to AQI comparisons. (Can add more analysis here...)</figcaption><BR clear="left">
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/yearly_aqi_fs.png" height="500" width="500"/>
+			<BR>
+			<pre style="white-space:pre-wrap">
+Brief: These analysis plots show the yearly correlation between average AQI (measured over each fire's duration) and the size of each fire over the range of dates (i.e. 1992-2015).
+Features: FIRE_SIZE --> Size of each fire considered 
+    	  AVG_AQI --> AQI level averaged over the entire duration of the fire
+Packages: sklearn, seaborn, matplotlib, numpy, pandas
+Type: Scatterplots
+Description: These analysis plots show the yearly correlation between average AQI (measured over each fire's duration) and the size of each fire over the range of dates (i.e. 1992-2015). They provide slightly different results from the fire sum to AQI comparisons. Any fire of "irrelevant" size, (i.e. <=30) was discarded, and yearly plots for roughly 3000 fires are shown here. While this does reveal slightly visible correlation (observe the "left-to-right" motion of the data points), it is obvious that such correlation can be improved by adding better features (see Clustering), because the direct influence of fire size on AQI is not enough.
+    						
+    		</pre>
+			<BR clear="left">
+
     </div>
     <!-- our javascript files -->
     <!-- <script src="choropleth.js"></script> -->
