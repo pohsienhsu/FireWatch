@@ -192,6 +192,8 @@ function loadDataAndCreateMap(selectedYear, state, county, fireData) {
 
 var first = 0
 var curr_node = new Object()
+var precision = d3.precisionFixed(.001), round = d3.format("." + precision + "f");
+
 // helpers for tooltip
 function showtooltip(d, properties_dict) {
   tooltip.transition()
@@ -222,7 +224,7 @@ function showtooltip(d, properties_dict) {
       if (filteredTooltipData !== undefined && geo_names !== undefined) {
         tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
                       + "<b>County</b>: " + geo_names[1] + "<br />"
-                      + "<b>Average Fire Size</b>: " + filteredTooltipData.AVG_FIRE_SIZE + "<br />"
+                      + "<b>Average Fire Size</b>: " + round(filteredTooltipData.AVG_FIRE_SIZE) + "<br />"
                       + "<b>Most Common Cause</b>: " + filteredTooltipData.MOST_COMMON_CAUSE + "<br />")
           .style("left", (d3.event.pageX + 20) + "px")
           .style("top", (d3.event.pageY + 20) + "px");
@@ -454,7 +456,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     fsizeTable[datum.fips] = datum.fire_size
   }
 
-  colorFireScale.domain(d3.extent(filteredFireData, function (d) { return d.fire_size ; }))
+  colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
 
   // only consider data for selectedGame
   // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })

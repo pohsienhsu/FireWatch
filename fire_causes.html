@@ -39,7 +39,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
           </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
@@ -81,7 +81,22 @@
       <BR></BR>
       <p span style="text-align:center;font-weight:bold">  Historical Nationwide Causes of Fire </p>
       		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
-         	<BR><figcaption>This analysis plot shows the historical cause of each fire across the range of dates (i.e. 1992-2015) (Can add more analysis here...)</figcaption><BR clear="left">
+         	<BR>
+         	<pre style="white-space:pre-wrap">
+Brief: This analysis plot shows the historical cause of each fire across the range of dates (i.e. 1992-2015)
+
+Features: STAT_CAUSE_DESCR --> (column) information regarding cause of each fire in our Fires dataset
+
+Type: Bar Plot
+
+Packages: sklearn, seaborn, matplotlib, numpy, pandas
+
+Data: Fires Dataset, Years 1992-2015
+
+Description: From this experiment, we would like to learn from the dataset about the major causes of each fire for each state and each year. The reason we want to investigate the causes of wildfire is that we think it can potentially be a factor to our classification models of predicting the AQI. From the results and charts, we’ve learned that debris burning would be the main causes of wildfire. With closer examination, we stacked the count number of each year from 1992-2015 and each cause together to have a better feel of the trends.   
+	</pre>
+	<BR clear="left">
+	
     </div>
     <!-- our javascript files -->
     <!-- <script src="choropleth.js"></script> -->

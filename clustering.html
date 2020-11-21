@@ -39,7 +39,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
           </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
@@ -84,11 +84,37 @@
             <BR></BR>
       		<img class="wrap" src="Yearly AQI Plots and Clustering/explained_variance_sample.png" height="250" width="250"/>
       		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
-			<BR><figcaption>PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. </figcaption><BR clear="left">
+			<BR>
+			<pre style="white-space:pre-wrap">
+Brief: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI.
+
+Input Features: 
+
+FIRE_SIZE --> Size of each fire considered 
+AVG_AQI --> AQI level averaged over the entire duration of the fire
+CONT_TIME --> date the fire was contained, suppressed
+LATITUDE, LONGITUDE --> location variables
+DAYS --> length of fire
+    	  		
+Output Features: 2 PCA Components
+
+Types: Histogram, Line Graph, Scatterplots
+
+Packages: sklearn (i.e. cluster, preprocessing, KMeans, PCA), seaborn, matplotlib, numpy, pandas
+
+Train/Test Sets: These are unsupervised learning algorithms, ergo the labels were "created" from a syncretizing of our fires and aqi datasets.
+
+Description: PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. This is one instance of dimensionality reduction in our work. Many features were converted into mroe informative z-space PCA vectors.
+    		</pre>
+			<BR clear="left">
         	<BR></BR>
         	<BR></BR>
             <img class="wrap" src="Yearly AQI Plots and Clustering/pca_kmeans.png" height="500" width="500"/>
-			<BR><figcaption>PCA/K-Means analysis yearly clusterings shown here. These incorporate more features (i.e. average AQI over fire, containment time, length of fire, fire size, and location, and so provide insight on the similarity of each fire using more data. </figcaption><BR clear="left">
+			<BR>
+			<pre style="white-space:pre-wrap">
+Description (cont.): The PCA components were used as input to a K-Means analysis; yearly clusterings shown here. Roughly 2500 fires across the range of dates (i.e. 1992-2015) were selected for this analysis. These incorporate more features (as explained earlier) and so provide insight on the similarity of each fire using more data. We see a more stable grouping, as evidenced by the rough equality of the various clusters.
+    		</pre>
+			<BR clear="left">
             <BR></BR>
             <BR></BR>
             <img class="wrap" src="Yearly AQI Plots and Clustering/kmeans_2d.png" height="500" width="500"/>
@@ -96,7 +122,18 @@
             <BR></BR>
             <BR></BR>
         	<figure>
-            	<BR><figcaption>Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. (Can add more analysis here...) </figcaption><BR clear="left">
+        	<BR>
+			<pre style="white-space:pre-wrap">
+Brief: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI.
+Features: FIRE_SIZE --> Size of each fire considered 
+    	  AVG_AQI --> AQI level averaged over the entire duration of the fire
+Packages: sklearn (i.e. cluster, preprocessing, KMeans, PCA), numpy, pandas, seaborn, matplotlib
+Type: Scatterplots
+Train/Test Sets: These are unsupervised learning algorithms, ergo the labels were "created" from a syncretizing of our fires and aqi datasets.
+Description: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. The conclusion of this analysis is that there is a valid grouping wherein wildfires are  best categorized in relation to the pairing of their size and air quality. The main purpose of this is dimensionality reduction, reducing it to the most base minimum components required.
+			
+    		</pre>
+			<BR clear="left">
 			</figure>
     </div>
     <!-- our javascript files -->

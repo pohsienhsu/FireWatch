@@ -39,7 +39,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
           </div>
           <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav" style="margin-left: 10%">
@@ -87,7 +87,26 @@
          	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_5_DAY_OFFSET.svg" height="300" width="300"/>
       		<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_6_DAY_OFFSET.svg" height="300" width="300"/>
          	<img class="wrap4" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_7_DAY_OFFSET.svg" height="300" width="300"/>
-         	<BR><figcaption>These analysis plots show the binary classification of AQI data over sigmoid function with threshold >= 100. The AQI was calculated over 1 to 7 day averages (Can add more analysis here...)</figcaption><BR clear="left">
+         	<BR>
+         	<figcaption>
+         	</figcaption>
+         	<pre style="white-space:pre-wrap">
+Brief: These analysis plots show the binary forecast classification of AQI data over sigmoid function with threshold >= 100. The AQI was calculated over 1 to 7 day averages. 
+
+Input Features: 
+  		
+Output Features: Ratio Classified, True AQI Value
+
+Types: Line Charts
+
+Packages: seaborn, matplotlib, numpy, sklearn
+
+Data: Fires Dataset, Years 1992-2015
+
+Description: For every day and county reporting AQI (7,243,237 unique entries), a classifier to predict whether AQI x days later would be above a threshold of 100 was made for x in [1,2,3,4,5,6,7]. Weighted logistic regression was used, with previous 7 days of AQI, fire size and count in the county and state 0, 1, and 2 weeks prior, and a one hot encoding of State and Month used as features. Results shown are for a 5-fold cross validation on the data, and predictions for counties w/out a recording x day out was done by training on the whole dataset. Missing values for previous 7 days of AQI was filled using a backfill. Below we can see that as the AQI prediction is for further out, the fraction of counties correctly classified worsens but the forecast remains meaningful. This is reflected in summary statistics for classification (Accuracy: D1 0.803, D2 0.791, D3 0.787, D4 0.784, D5 0.783, D6 0.784, D7 0.780). Importantly, the logistic regressor increases in accuracy as the True AQI value furthers from our threshold (100), indicating for extreme AQI days the classifier is extremely reliable.   
+
+			</pre>
+         	<BR clear="left">
     </div>
     <!-- our javascript files -->
     <!-- <script src="choropleth.js"></script> -->
