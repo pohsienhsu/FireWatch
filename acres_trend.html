@@ -83,21 +83,22 @@
       <BR></BR>
       <BR></BR>
       <BR></BR>
-      <p span style="text-align:center;font-weight:bold">  Fire Cases </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Fire_Cases.svg" height="500" width="500"/>
+      <p span style="text-align:center;font-weight:bold">   </p>
+      		<img class="wrap" src="analysis_plots/trend/fire_trend_years.svg" height="500" width="500"/>
          	<BR>
          	<pre style="white-space:pre-wrap">
-Brief: This analysis plot shows the aggregate cause of each fire in our dataset.
+Brief: This analysis plot shows acres burned across the range of total dates in the fires dataset.
 
-Features: STAT_CAUSE_DESCR --> (column) information regarding cause of each fire in our Fires dataset
+Features: 
 
-Type: Bar Plot
+Type: Line Chart
 
 Packages: sklearn, seaborn, matplotlib, numpy, pandas
 
 Data: Fires Dataset, Years 1992-2015
 
-Description: From this experiment, we would like to learn from the dataset about the major causes of each fire across all years and regions. The reason we want to investigate the causes of wildfire is that we think it can potentially be a factor to our classification models of predicting the AQI. From the results and charts, we’ve learned that debris burning, followed by arson, would be the main causes of wildfire.
+Description: This analysis plot shows acres burned across the range of total dates in the fires dataset. The trend line is aggregated across all years, and shows a strong linear correlation between time and millions of acres burned. From this, we can observe that the fire intensities escalate as the years advance, and our choropleth should reflect this. It seems to peak in 2005 and 2012, and it can be seen on our map for those years that in fact an alarmingly high frequency of high intensity fires (i.e. fire size >200 and <490, one even hit 998.0 size) did in fact occur during these time periods to create this effect. Thus, our visualizer accurately reflects our observations.
+ 
 	</pre>
 	<BR clear="left">
          	<BR clear="left">
