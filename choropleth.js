@@ -17,7 +17,8 @@ var colorScale = d3.scaleThreshold()
   .range(["grey", "green", "yellow", "orange", "red", "purple", "maroon"]);
 
 var colorFireScale = d3.scaleQuantile()
-  .range(d3.schemeReds[4]);
+  .domain([0, 0.25, 10, 100, 300, 1000, 5000, 1000000])
+  .range(d3.schemeReds[7]);
 
 // enter code to define tooltip
 var tooltip = d3.select('body').append("div")
@@ -179,7 +180,6 @@ function loadDataAndCreateMap(selectedYear, state, county, fireData) {
 
         fireData = data
         fire_yearly_data[selectedYear] = data
-        colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
 
         handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
         createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
@@ -226,20 +226,12 @@ function showtooltip(d, properties_dict) {
       if (filteredTooltipData !== undefined && geo_names !== undefined) {
         tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
                       + "<b>County</b>: " + geo_names[1] + "<br />"
+                      + "<b>Max Fire Size</b>: " + round(geo_names[2]) + "<br />"
                       + "<b>Average Fire Size</b>: " + round(filteredTooltipData.AVG_FIRE_SIZE) + "<br />"
                       + "<b>Most Common Cause</b>: " + filteredTooltipData.MOST_COMMON_CAUSE + "<br />")
           .style("left", (d3.event.pageX + 20) + "px")
           .style("top", (d3.event.pageY + 20) + "px");
 
-          d3.xml("analysis_plots/state_level_monthly_paired_view/monthly_paired_view_avg_" + county_info[0]+ ".svg")
-          .then((data)=> {
-            if (first == 1) {
-              tooltip.select("svg").html("")
-            }
-
-            curr_node = tooltip.node().appendChild(data.documentElement);
-            first = 1
-          });
       } else {
         tooltip.html("<b>No available data for this county</b><br />")
         .style("left", (d3.event.pageX + 20) + "px")
@@ -410,7 +402,7 @@ function showAqiMap(state, county, fireData, aqiData, selectedYear, selectedMont
   var legend = d3.legendColor()
               .scale(colorScale)
               .title("AQI Level Legend")
-              .labels(["N/A", "Good (0 to 50)", "Moderate (51 to 100)", "Unhealthy for Sensitive Groups (101 to 150)", "Unhealthy (151 to 200)", "Very Unhealthy (201 to 300)", "Hazardous (301 and higher)"])
+              .labels(["No Data", "Good (0 to 50)", "Moderate (51 to 100)", "Unhealthy for Sensitive Groups (101 to 150)", "Unhealthy (151 to 200)", "Very Unhealthy (201 to 300)", "Hazardous (301 and higher)"])
               //.labels(d3.legendHelpers.thresholdLabels)
               .labelFormat(d3.format('.2f'));
   d3.select(".legend").call(legend);
@@ -455,7 +447,12 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   for (var i = 0; i < filteredFireData.length; i++)
   {
     datum = filteredFireData[i]
-    fsizeTable[datum.fips] = datum.fire_size
+
+    if (datum.fips in fsizeTable) {
+        fsizeTable[datum.fips] = Math.max(datum.fire_size, fsizeTable[datum.fips])
+    } else {
+        fsizeTable[datum.fips] = datum.fire_size
+    }
   }
 
   //colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
@@ -465,7 +462,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   // mapping from each county to its properties
   let properties_dict = {}
   filteredFireData.forEach((datum) => {
-    properties_dict[datum.fips] = [datum.STATE_NAME, datum.COUNTY_NAME]
+    properties_dict[datum.fips] = [datum.STATE_NAME, datum.COUNTY_NAME, fsizeTable[datum.fips]]
   })
   // colorScale.domain(d3.extent(fireData, function (d) { return parseYear(d.year); }))
 
@@ -498,10 +495,11 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
   //also add the legend
   svg.append("g")
      .attr("class", "legend")
-     .attr("transform", "translate(" + (width - 130) + ", " + 20 + ")");
+     .attr("transform", "translate(" + (width - 300) + ", " + 20 + ")");
   var legend = d3.legendColor()
               .scale(colorFireScale)
-              .title("Fire Size Legend")
+              .title("Fire Size Legend (Acres Burned)")
+              .labels(["0 to 0.25 acres", "0.25 to 10 acres", "10 to 100 acres", "100 to 300 acres", "300 to 1000 acres", "1000 to 5000 acres", "5000+ acres"])
               .labelFormat(d3.format('.2f'));
   d3.select(".legend").call(legend);
 }
