@@ -83,21 +83,23 @@
       <BR></BR>
       <BR></BR>
       <BR></BR>
-      <p span style="text-align:center;font-weight:bold">  Fire Cases </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Fire_Cases.svg" height="500" width="500"/>
+      <p span style="text-align:center;font-weight:bold">  AQI Boxplot </p>
+      		<img class="wrap" src="analysis_plots/trend/AQI_percent_change.svg" height="500" width="500"/>
          	<BR>
          	<pre style="white-space:pre-wrap">
-Brief: This analysis plot shows the aggregate cause of each fire in our dataset.
+Brief: This analysis plot shows  average and variance statistics in boxplot format for AQI data.
 
-Features: STAT_CAUSE_DESCR --> (column) information regarding cause of each fire in our Fires dataset
+Features: FIRE_SIZE --> Size of each fire considered 
+    	  AQI change --> AQI level percent change over 14-day average.
 
-Type: Bar Plot
+Type: Box Plot
 
 Packages: sklearn, seaborn, matplotlib, numpy, pandas
 
-Data: Fires Dataset, Years 1992-2015
+Data: AQI Dataset, Years 1992-2015
 
-Description: From this experiment, we would like to learn from the dataset about the major causes of each fire across all years and regions. The reason we want to investigate the causes of wildfire is that we think it can potentially be a factor to our classification models of predicting the AQI. From the results and charts, we’ve learned that debris burning, followed by arson, would be the main causes of wildfire.
+Description: From our intuition and previous wildfire news coverage, we expected large wildfires to have a major impact on air quality. To test this hypothesis, we measured the AQI change over a 14-day window for wildfires starting from the time the fire was discovered. Here, AQI change is the percent change compared to the AQI average over the year for that county.  Our findings show that small fires (< 5,000 acres burned) had a minor impact on the AQI with an average increase of 7.1%.  Medium-sized fires (between 5,000 and 10,000 acres burned) had an average AQI increase of 42.8% while large fires (> 10,000 acres burned) had an average AQI increase of 65.0%.  For random days, the average AQI change over a 14-day window had an average increase of -0.6% which is very close to 0 and is what we expected.  While this trend clearly shows that larger wildfires have more impact on the AQI, we noticed that there is also a larger variance in the AQI change for larger wildfires as seen in the boxplot below. This implies that there may be other factors that can heavily affect the AQI besides the presence of wildfires (e.g., wind, rain, fog, size of county, distance from fire to sensor, etc.) 
+
 	</pre>
 	<BR clear="left">
          	<BR clear="left">

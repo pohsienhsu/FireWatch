@@ -64,10 +64,13 @@
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="clustering.html">Clustering</a>
                   <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="aqi_trend.html">AQI 14-day Analysis</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="acres_trend.html">Acres Analysis (Aggregate)</a>
+                  <div class="dropdown-divider"></div>
                 </div>
               </li>
-              <li><a href="#discussion">Discussion</a></li>
-              <li><a href="#conclusion">Report</a></li>
+              <li><a href="disc-conc.html">Discussion and Conclusions</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -119,78 +122,6 @@
           </div>
         </div>
       </div>
-
-      <!--<section id="analysis">
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Data Analysis Section</p>
-        </blockquote>
-        <p span style="text-align:center;font-weight:bold">  Monthly Paired Data Analysis (Acres Burned) </p>
-        <div id="content">
-        	<img class="wrap" src="analysis_plots/monthly_paired_view_sharey_True.svg" height="500" width="500"/>
-         	<img class="wrap2" src="analysis_plots/legend_monthly_paired_view.svg" height="350" width="350"/>
-     		<BR><figcaption>These analysis plots show the monthly paired data for acres burned across month and average AQI level. (Can add more analysis here...)</figcaption><BR clear="left">
-      	</div>
-      	<BR></BR>
-      	<p span style="text-align:center;font-weight:bold"> Logistic Regression </p>
-			<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_1_DAY_OFFSET.svg" height="300" width="300"/>
-         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_2_DAY_OFFSET.svg" height="300" width="300"/>
-      		<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_3_DAY_OFFSET.svg" height="300" width="300"/>
-         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_4_DAY_OFFSET.svg" height="300" width="300"/>
-         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_5_DAY_OFFSET.svg" height="300" width="300"/>
-      		<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_6_DAY_OFFSET.svg" height="300" width="300"/>
-         	<img class="wrap4" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_7_DAY_OFFSET.svg" height="300" width="300"/>
-         	<BR><figcaption>These analysis plots show the binary classification of AQI data over sigmoid function with threshold >= 100. The AQI was calculated over 1 to 7 day averages (Can add more analysis here...)</figcaption><BR clear="left">
-      	<BR></BR>
-      	<p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Sum vs. AQI) </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/AQI&Fire_Sum Correlation/corr_Month.svg" height="500" width="500"/>
-         	<BR><figcaption>These analysis plots show yearly correlation between AQI and fire sum. (Can add more analysis here...)</figcaption><BR clear="left">
-      	<BR></BR>
-      	<p span style="text-align:center;font-weight:bold">  Fire Cases </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Fire_Cases.svg" height="500" width="500"/>
-         	<BR><figcaption>This analysis plot shows the aggregate cause of each fire in our dataset.(Can add more analysis here...)</figcaption><BR clear="left">
-		<BR></BR>
-		<p span style="text-align:center;font-weight:bold">  Historical Nationwide Causes of Fire </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
-         	<BR><figcaption>This analysis plot shows the historical cause of each fire across the range of dates (i.e. 1992-2015) (Can add more analysis here...)</figcaption><BR clear="left">
-    	<BR></BR>
-        <p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Size vs. Average AQI) </p>
-      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
-			<BR><figcaption>These analysis plots show the yearly correlation between average AQI (measured over each fire's duration) and the size of each fire over the range of dates (i.e. 1992-2015). They provide slightly different results from the fire sum to AQI comparisons. (Can add more analysis here...)</figcaption><BR clear="left">
-    	<BR></BR>
-        <p span style="text-align:center;font-weight:bold"> Clustering Analysis </p>
-            <BR></BR>
-            <BR></BR>
-      		<img class="wrap" src="Yearly AQI Plots and Clustering/explained_variance_sample.png" height="250" width="250"/>
-      		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="350"/>
-			<BR><figcaption>PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. </figcaption><BR clear="left">
-        	<BR></BR>
-        	<BR></BR>
-            <img class="wrap" src="Yearly AQI Plots and Clustering/pca_kmeans.png" height="500" width="500"/>
-			<BR><figcaption>PCA/K-Means analysis yearly clusterings shown here. These incorporate more features (i.e. average AQI over fire, containment time, length of fire, fire size, and location, and so provide insight on the similarity of each fire using more data. </figcaption><BR clear="left">
-            <BR></BR>
-            <BR></BR>
-            <img class="wrap" src="Yearly AQI Plots and Clustering/kmeans_2d.png" height="500" width="500"/>
-            <img class="wrap4" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="350"/>
-            <BR></BR>
-            <BR></BR>
-        	<figure>
-            	<BR><figcaption>Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. (Can add more analysis here...) </figcaption><BR clear="left">
-			</figure>
-      </section>-->
-
-      <section id="discussion">
-        <BR></BR>
-        <BR></BR>
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Talk about the findings...</p>
-        </blockquote>
-      </section>
-
-      <section id="conclusion">
-        <blockquote class="blockquote text-center">
-          <p class="mb-0">Conclusion: Smoke is bad</p>
-        </blockquote>
-      </section>
     </div>
 
     <!-- our javascript files -->

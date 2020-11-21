@@ -179,6 +179,8 @@ function loadDataAndCreateMap(selectedYear, state, county, fireData) {
 
         fireData = data
         fire_yearly_data[selectedYear] = data
+        colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
+
         handleMonthAndDay(state, county, fireData, aqiData, selectedYear)
         createMapAndLegend(state, county, fireData, aqiData, selectedYear, selectedMonth, selectedDay)
     })
@@ -456,7 +458,7 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     fsizeTable[datum.fips] = datum.fire_size
   }
 
-  colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
+  //colorFireScale.domain(d3.extent(fireData, function (d) { return d.fire_size ; }))
 
   // only consider data for selectedGame
   // let filteredfireData = fireData.filter((datum) => { return datum.game === selectedGame })
