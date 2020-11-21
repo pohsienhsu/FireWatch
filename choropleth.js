@@ -226,8 +226,8 @@ function showtooltip(d, properties_dict) {
       if (filteredTooltipData !== undefined && geo_names !== undefined) {
         tooltip.html("<b>State</b>: " + geo_names[0] + "<br />"
                       + "<b>County</b>: " + geo_names[1] + "<br />"
-                      + "<b>Max Fire Size</b>: " + round(geo_names[2]) + "<br />"
-                      + "<b>Average Fire Size</b>: " + round(filteredTooltipData.AVG_FIRE_SIZE) + "<br />"
+                      + "<b>County Max Fire Size (per Day)</b>: " + round(geo_names[2]) + "<br />"
+                      + "<b>County Average Fire Size (per Year)</b>: " + round(filteredTooltipData.AVG_FIRE_SIZE) + "<br />"
                       + "<b>Most Common Cause</b>: " + filteredTooltipData.MOST_COMMON_CAUSE + "<br />")
           .style("left", (d3.event.pageX + 20) + "px")
           .style("top", (d3.event.pageY + 20) + "px");
@@ -449,9 +449,9 @@ function showFireMap(state, county, fireData, aqiData, selectedYear, selectedMon
     datum = filteredFireData[i]
 
     if (datum.fips in fsizeTable) {
-        fsizeTable[datum.fips] = Math.max(datum.fire_size, fsizeTable[datum.fips])
+        fsizeTable[datum.fips] = Math.max(parseInt(datum.fire_size), fsizeTable[datum.fips])
     } else {
-        fsizeTable[datum.fips] = datum.fire_size
+        fsizeTable[datum.fips] = parseInt(datum.fire_size)
     }
   }
 
