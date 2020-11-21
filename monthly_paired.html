@@ -85,11 +85,13 @@
       <BR></BR>
       <p span style="text-align:center;font-weight:bold">  Monthly Paired Data Analysis (Acres Burned) </p>
         <div id="content">
-        	<img class="wrap" src="analysis_plots/monthly_paired_view_sharey_True.svg" height="500" width="500"/>
-         	<img class="wrap2" src="analysis_plots/legend_monthly_paired_view.svg" height="350" width="350"/>
-     		<BR>
-     		
-     		<pre style="white-space:pre-wrap">
+        	<table>
+              <tr><td><img  src="analysis_plots/monthly_paired_view_sharey_True.svg" height="1000" width="600"/></td>
+                  <td valign="top"> 
+                    <br>
+                   <table>
+                      <tr><td>
+                        <pre style="white-space:pre-wrap">
 Brief: These analysis plots show the monthly paired data for acres burned across month and average AQI level. 
 
 Input Features: 
@@ -103,8 +105,11 @@ Packages: sklearn, seaborn, matplotlib, numpy, pandas
 Data: Fires Dataset, Years 1998-2015
 
 Description: These analysis plots show the monthly paired data for acres burned across month and average AQI level. Each individual year is shown as a separate line, with an average for each month for both metrics shown as the dotted trend lines. This allows us to observe an advanced pairing between air quality levels, acres burned, and fire size. Note the trend lines show a "peak" mid-year, which corresponds with the likelihood that wildfires have more veracity in the summer hot months.
-
-			</pre>
+			            </pre></td></tr>
+     	              <tr><td> <img  src="analysis_plots/legend.png" height="150" width="600"> </td></tr>
+               </td></tr>
+            </table>
+       </p>
      		<BR clear="left">
       	</div>
     </div>
