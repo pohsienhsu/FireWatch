@@ -98,6 +98,9 @@
 Brief: These analysis plots show the binary forecast classification of AQI data over sigmoid function with threshold >= 100. The AQI was calculated over 1 to 7 day averages. 
 
 Input Features: 
+- Previous 7 days of AQI
+- Fire Size and Count in the County and State 0, 1, and 2 weeks prior
+- a one hot encoding of State and Month. 
   		
 Output Features: Ratio Classified, True AQI Value
 
