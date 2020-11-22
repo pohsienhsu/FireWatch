@@ -1,0 +1,86 @@
+/* D3 tooltip for map */
+div.tooltip {
+    position: absolute;
+    text-align: center;
+    color: white;
+    width: 220px;
+    height: 120px;         
+    padding: 2px;
+    font: 12px sans-serif;
+    background-color: gray;
+    border: 2px;
+    border: solid;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+div.centered {
+  top: 50%;
+  left: 50%;
+}
+
+.wrap {
+  float: left;
+}
+
+.wrap2 {
+  float: none;
+  margin-left: -150px;
+  margin-top: -120px;
+}
+
+.wrap3 {
+  float: left;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.wrap4 {
+  float: none;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* Navbar styling */
+.navbar.navbar-inverse {
+  background-color: #26628a;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .navbar-nav > li > a {
+  background-color: #26628a;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .navbar-nav > li > a:hover {
+  color: #42cbad;
+}
+.navbar.navbar-inverse .navbar-nav > .active,
+.navbar.navbar-inverse .navbar-nav > .active > a,
+.navbar.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar.navbar-inverse .navbar-nav > .active > a:focus {
+  background-color: #486972;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .dropdown-menu {
+  background-color: #628ba7;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .dropdown-menu .dropdown-item {
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .dropdown-menu > li > a:hover,
+.navbar.navbar-inverse .dropdown-menu>li>a:focus {
+  background-color: #26628a;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .navbar-nav li.dropdown.open > .dropdown-toggle,
+.navbar.navbar-inverse .navbar-nav li.dropdown.active > .dropdown-toggle,
+.navbar.navbar-inverse .navbar-nav li.dropdown.open.active > .dropdown-toggle {
+  background: #486972;
+  color: #eef9fa;
+}
+.navbar.navbar-inverse .navbar-nav>.dropdown>a:hover .caret {
+  border-bottom-color: #486972;
+}
+.navbar.navbar-inverse .navbar-brand {
+  color: #eef9fa;
+}
