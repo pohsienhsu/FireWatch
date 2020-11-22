@@ -11,7 +11,7 @@ for name, group in fires_by_year:
     group.to_csv("fires_" + str(name) + ".csv", index = False)
 
 # Generate statistics for tooltip
-for i in range(1992, 2021):
+for i in range(1992, 2016):
     df = pd.read_csv("fires_" + str(i) + ".csv")
     df_G = df.groupby(['STATE_CODE', 'COUNTY_CODE'])
     df_mean =  df_G.agg({'FIRE_SIZE':'mean'}).reset_index()
