@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/favicon.ico">
+    <link rel="canonical" href="https://getbootstrap.com/docs/3.3/examples/starter-template/">
+
+    <title>Analysis</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+    <!-- Custom styles for this template -->
+    <link href="local_styles.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <div class="container-fluid mb-5">
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer: <small>Samuel Stentz</small></a>
+          </div>
+          <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" style="margin-left: 10%">
+              <li><a href="index.html" target="_top">Map</a></li>
+              <li><a href="analysis.html" target="_top">Analysis</a></li>
+              <li><a href="#discussion">Discussion</a></li>
+              <li><a href="#conclusion">Conclusion</a></li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <!-- Dropdown and Toggles -->
+    <div class="container mt-5">
+        <BR></BR>
+      	<BR></BR>
+      	<BR></BR>
+
+	    <blockquote class="blockquote text-center">
+          <p class="mb-2" style="font-weight:bold">Data Analysis</p>
+      </blockquote style="bottom:-30px">
+        <p span style="text-align:center;font-weight:bold">  Monthly Paired Data Analysis (Acres Burned) </p>
+        <div id="content">
+        	<img class="wrap" src="analysis_plots/monthly_paired_view_sharey_True.svg" height="500" width="500"/>
+         	<img class="wrap2" src="analysis_plots/legend_monthly_paired_view.svg" height="350" width="350"/>
+     		<BR><figcaption>These analysis plots show the monthly paired data for acres burned across month and average AQI level. (Can add more analysis here...)</figcaption><BR clear="left">
+      	</div>
+      	<BR></BR>
+      	<p span style="text-align:center;font-weight:bold"> Logistic Regression </p>
+			<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_1_DAY_OFFSET.svg" height="300" width="300"/>
+         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_2_DAY_OFFSET.svg" height="300" width="300"/>
+      		<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_3_DAY_OFFSET.svg" height="300" width="300"/>
+         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_4_DAY_OFFSET.svg" height="300" width="300"/>
+         	<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_5_DAY_OFFSET.svg" height="300" width="300"/>
+      		<img class="wrap3" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_6_DAY_OFFSET.svg" height="300" width="300"/>
+         	<img class="wrap4" src="analysis_plots/hist1D/class_distribution_Logistic Regression Weighted_100_AQI_7_DAY_OFFSET.svg" height="300" width="300"/>
+         	<BR><figcaption>These analysis plots show the binary classification of AQI data over sigmoid function with threshold >= 100. The AQI was calculated over 1 to 7 day averages (Can add more analysis here...)</figcaption><BR clear="left">
+      	<BR></BR>
+      	<p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Sum vs. AQI) </p>
+      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/AQI&Fire_Sum Correlation/corr_Month.svg" height="500" width="500"/>
+         	<BR><figcaption>These analysis plots show yearly correlation between AQI and fire sum. (Can add more analysis here...)</figcaption><BR clear="left">
+      	<BR></BR>
+      	<p span style="text-align:center;font-weight:bold">  Fire Cases </p>
+      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Fire_Cases.svg" height="500" width="500"/>
+         	<BR><figcaption>This analysis plot shows the aggregate cause of each fire in our dataset.(Can add more analysis here...)</figcaption><BR clear="left">
+		<BR></BR>
+		<p span style="text-align:center;font-weight:bold">  Historical Nationwide Causes of Fire </p>
+      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
+         	<BR><figcaption>This analysis plot shows the historical cause of each fire across the range of dates (i.e. 1992-2015) (Can add more analysis here...)</figcaption><BR clear="left">
+    	<BR></BR>
+        <p span style="text-align:center;font-weight:bold">  Yearly Correlation (Fire Size vs. Average AQI) </p>
+      		<img class="wrap" src="Correlation&Fire Cases SVG/National SVG/Fire Cases/Historical_National Fire_Cause Cases.svg" height="500" width="500"/>
+			<BR><figcaption>These analysis plots show the yearly correlation between average AQI (measured over each fire's duration) and the size of each fire over the range of dates (i.e. 1992-2015). They provide slightly different results from the fire sum to AQI comparisons. (Can add more analysis here...)</figcaption><BR clear="left">
+    	<BR></BR>
+        <p span style="text-align:center;font-weight:bold"> Clustering Analysis </p>
+            <BR></BR>
+            <BR></BR>
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/explained_variance_sample.png" height="250" width="250"/>
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
+			<BR><figcaption>PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. </figcaption><BR clear="left">
+        	<BR></BR>
+        	<BR></BR>
+            <img class="wrap" src="Yearly AQI Plots and Clustering/pca_kmeans.png" height="500" width="500"/>
+			<BR><figcaption>PCA/K-Means analysis yearly clusterings shown here. These incorporate more features (i.e. average AQI over fire, containment time, length of fire, fire size, and location, and so provide insight on the similarity of each fire using more data. </figcaption><BR clear="left">
+            <BR></BR>
+            <BR></BR>
+            <img class="wrap" src="Yearly AQI Plots and Clustering/kmeans_2d.png" height="500" width="500"/>
+            <img class="wrap4" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
+            <BR></BR>
+            <BR></BR>
+        	<figure>
+            	<BR><figcaption>Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. (Can add more analysis here...) </figcaption><BR clear="left">
+			</figure>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>

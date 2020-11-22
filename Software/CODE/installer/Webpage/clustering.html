@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="images/favicon.ico">
+    <link rel="canonical" href="https://getbootstrap.com/docs/3.3/examples/starter-template/">
+
+    <title>Air Pollution Visualizer</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+
+    <!-- Custom styles for this template -->
+    <link href="local_styles.css" rel="stylesheet">
+
+    <!-- D3 Source JS, may need to add more than this later -->
+    <script type="text/javascript" src="lib/d3.v5.min.js"></script>
+    <script type="text/javascript" src="lib/d3-geo-projection.v2.min.js"></script>
+    <script type="text/javascript" src="lib/d3-legend.min.js"></script>
+    <script type="text/javascript" src="lib/d3-tip.min.js"></script>
+    <script type="text/javascript" src="lib/topojson.v2.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-array.v2.min.js"></script>
+
+  </head>
+
+  <body>
+    <div class="container-fluid mb-5">
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Fires and Air Pollution Data Visualizer</a>
+          </div>
+          <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav" style="margin-left: 10%">
+              <li><a href="index.html" target="_top">Map</a></li>
+              <!-- <li><a href="analysis.html" target="_top">Analysis</a></li> -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Analysis Dropdown
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="monthly_paired.html">Monthly Paired (Acres Burned)</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="logistic_reg.html">Logistic Regression</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="yearly_corr_firesumAQI.html">Yearly Correlation (Fire Sum vs. AQI)</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="fire_cases.html">Fire Cases</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="fire_causes.html">Causes of Fire</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="yearly_corr_firesizeAQI.html">Yearly Correlation (Fire Size vs. Average AQI)</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="clustering.html">Clustering</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="aqi_trend.html">AQI 14-day Analysis</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="acres_trend.html">Acres Analysis (Aggregate)</a>
+                  <div class="dropdown-divider"></div>
+                </div>
+              </li>
+              <li><a href="disc-conc.html">Discussion and Conclusions</a></li>
+
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </nav>
+    </div>
+
+    <!-- Dropdown and Toggles -->
+    <div class="container mt-5">
+      <BR></BR>
+      <BR></BR>
+      <BR></BR>
+      <p span style="text-align:center;font-weight:bold"> Clustering Analysis </p>
+            <BR></BR>
+            <BR></BR>
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/explained_variance_sample.png" height="250" width="250"/>
+      		<img class="wrap" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
+			<BR>
+			<pre style="white-space:pre-wrap">
+Brief: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI.
+
+Input Features: 
+
+FIRE_SIZE --> Size of each fire considered 
+AVG_AQI --> AQI level averaged over the entire duration of the fire
+CONT_TIME --> date the fire was contained, suppressed
+LATITUDE, LONGITUDE --> location variables
+DAYS --> length of fire
+    	  		
+Output Features: 2 PCA Components
+
+Types: Histogram, Line Graph, Scatterplots
+
+Packages: sklearn (i.e. cluster, preprocessing, KMeans, PCA), seaborn, matplotlib, numpy, pandas
+
+Train/Test Sets: These are unsupervised learning algorithms, ergo the labels were "created" from a syncretizing of our fires and aqi datasets.
+
+Description: PCA/K-Means analysis was performed on roughly 2500 fires for each year over the range of dates (i.e. 1992-2015). Here we see a histogram of the explained variance for the 2 components and the elbow method decision (indicating K=3 elbow) for one of the years, 2006. This is one instance of dimensionality reduction in our work. Many features were converted into mroe informative z-space PCA vectors.
+    		</pre>
+			<BR clear="left">
+        	<BR></BR>
+        	<BR></BR>
+            <img class="wrap" src="Yearly AQI Plots and Clustering/pca_kmeans.png" height="500" width="500"/>
+			<BR>
+			<pre style="white-space:pre-wrap">
+Description (cont.): The PCA components were used as input to a K-Means analysis; yearly clusterings shown here. Roughly 2500 fires across the range of dates (i.e. 1992-2015) were selected for this analysis. These incorporate more features (as explained earlier) and so provide insight on the similarity of each fire using more data. We see a more stable grouping, as evidenced by the rough equality of the various clusters.
+    		</pre>
+			<BR clear="left">
+            <BR></BR>
+            <BR></BR>
+            <img class="wrap" src="Yearly AQI Plots and Clustering/kmeans_2d.png" height="500" width="500"/>
+            <img class="wrap4" src="Yearly AQI Plots and Clustering/elbow_sample.png" height="250" width="400"/>
+            <BR></BR>
+            <BR></BR>
+        	<figure>
+        	<BR>
+			<pre style="white-space:pre-wrap">
+Brief: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI.
+Features: FIRE_SIZE --> Size of each fire considered 
+    	  AVG_AQI --> AQI level averaged over the entire duration of the fire
+Packages: sklearn (i.e. cluster, preprocessing, KMeans, PCA), numpy, pandas, seaborn, matplotlib
+Type: Scatterplots
+Train/Test Sets: These are unsupervised learning algorithms, ergo the labels were "created" from a syncretizing of our fires and aqi datasets.
+Description: Additional yearly clusterings analysis shown here over the grouping between fire size and average AQI. The conclusion of this analysis is that there is a valid grouping wherein wildfires are  best categorized in relation to the pairing of their size and air quality. The main purpose of this is dimensionality reduction, reducing it to the most base minimum components required.
+			
+    		</pre>
+			<BR clear="left">
+			</figure>
+    </div>
+    <!-- our javascript files -->
+    <!-- <script src="choropleth.js"></script> -->
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+  </body>
+</html>
