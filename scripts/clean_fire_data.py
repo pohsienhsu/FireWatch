@@ -27,8 +27,8 @@ columns = [
 ]
 
 
-print("Reading fires.csv...")
-fires = pd.read_csv("fires.csv")
+print("Reading fires_ascii.csv...")
+fires = pd.read_csv("fires_ascii.csv")
 
 print("Reading state_abbrev.csv...")
 state_abbrev = pd.read_csv("state_abbrev.csv")
@@ -44,4 +44,12 @@ fires = pd.merge(fires, fips_codes, on=['FIPS_CODE', 'STATE'])
 
 fires.FIPS_CODE = fires.FIPS_CODE.astype(int)
 
+# Convert Julian dates to datetime
+epoch = pd.to_datetime(0, unit='s').to_julian_date() 
+fires['DISCOVERY_DATE'] = pd.to_datetime(fires['DISCOVERY_DATE'] - epoch, unit='D') 
+fires['CONT_DATE']= pd.to_datetime(fires['CONT_DATE'] - epoch, unit='D') 
 
+# Rename some fields 
+fires = fires.rename(columns={"FIPS_CODE":"COUNTY_CODE", "FIPS_STATE":"STATE_CODE", "STATE":"STATE_NAME"})
+
+fires.to_csv("fires.csv", index=False) 
